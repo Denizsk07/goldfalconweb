@@ -222,7 +222,7 @@ h1.glimmer-text {
 .live-status {
     display: flex;
     justify-content: center;
-    margin-bottom: 3.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .status-badge {
