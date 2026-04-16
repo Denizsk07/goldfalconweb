@@ -416,70 +416,65 @@ h1.glimmer-text {
     z-index: 10;
 }
 
+/* Sequence of pushing UP */
+/* All animations are synced on a 10s timeline. Total blank from 85% to 100% */
 .candle {
     position: relative;
     width: 16px;
     display: flex;
     justify-content: center;
     opacity: 0;
+    transform-origin: bottom;
 }
 
-.candle .wick {
-    position: absolute;
-    width: 2px;
-    bottom: 0;
-    z-index: 1;
-}
-
-.candle .body {
-    position: absolute;
-    width: 100%;
-    border-radius: 1px;
-    z-index: 2;
-}
-
-.green-candle .wick { background: #089981; }
-.green-candle .body { background: #089981; border: 1px solid #089981; box-shadow: 0 0 8px rgba(8, 153, 129, 0.5); }
-
-.red-candle .wick { background: #f23645; }
-.red-candle .body { background: #f23645; border: 1px solid #f23645; }
-
-/* Sequence of pushing UP */
-/* c1: Red drop into Entry */
-.c1 { height: 100px; animation: stayCandle 6s infinite 0s; bottom: 50px; }
+.c1 { height: 100px; bottom: 50px; animation: animC1 8s infinite; }
 .c1 .wick { height: 60px; bottom: 0; }
 .c1 .body { height: 40px; bottom: 10px; }
 
-/* c2: Bullish Pinbar (Sweep) at Entry */
-.c2 { height: 100px; animation: stayCandle 6s infinite 0.7s; bottom: 40px; }
+.c2 { height: 100px; bottom: 40px; animation: animC2 8s infinite; }
 .c2 .wick { height: 50px; bottom: 0; }
 .c2 .body { height: 15px; bottom: 30px; }
 
-/* c3: Big Green push hitting TP1 */
-.c3 { height: 150px; animation: stayCandle 6s infinite 1.4s; bottom: 85px; }
+.c3 { height: 150px; bottom: 85px; animation: animC3 8s infinite; }
 .c3 .wick { height: 90px; bottom: 0; }
 .c3 .body { height: 70px; bottom: 10px; }
 
-/* c4: Continuation hitting TP2 */
-.c4 { height: 200px; animation: stayCandle 6s infinite 2.1s; bottom: 165px; }
+.c4 { height: 200px; bottom: 165px; animation: animC4 8s infinite; }
 .c4 .wick { height: 80px; bottom: 0; }
 .c4 .body { height: 60px; bottom: 5px; }
 
-/* c5: Massive blast through TP3 */
-.c5 { height: 280px; animation: wickCandle 6s infinite 2.8s; bottom: 230px;}
+.c5 { height: 280px; bottom: 230px; animation: animC5 8s infinite; }
 .c5 .wick { height: 100px; bottom: 0; }
 .c5 .body { height: 70px; bottom: 15px; }
 
-@keyframes stayCandle {
-    0%, 5% { opacity: 0; transform: scaleY(0.1); transform-origin: bottom; }
-    10%, 90% { opacity: 1; transform: scaleY(1); }
-    100% { opacity: 0; }
+@keyframes animC1 {
+    0%, 5% { opacity: 0; transform: scaleY(0.1); }
+    15%, 80% { opacity: 1; transform: scaleY(1); }
+    85%, 100% { opacity: 0; transform: scaleY(1); }
 }
 
-@keyframes wickCandle {
-    0%, 5% { opacity: 0; transform: scaleY(0.1); transform-origin: bottom; }
-    10%, 90% { opacity: 1; transform: scaleY(1); }
-    100% { opacity: 0; }
+@keyframes animC2 {
+    0%, 20% { opacity: 0; transform: scaleY(0.1); }
+    30%, 80% { opacity: 1; transform: scaleY(1); }
+    85%, 100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes animC3 {
+    0%, 35% { opacity: 0; transform: scaleY(0.1); }
+    45%, 80% { opacity: 1; transform: scaleY(1); }
+    85%, 100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes animC4 {
+    0%, 50% { opacity: 0; transform: scaleY(0.1); }
+    60%, 80% { opacity: 1; transform: scaleY(1); }
+    85%, 100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes animC5 {
+    0%, 65% { opacity: 0; transform: scaleY(0.1); }
+    75%, 80% { opacity: 1; transform: scaleY(1); }
+    85%, 100% { opacity: 0; transform: scaleY(1); }
 }
 
 .tp-line {
