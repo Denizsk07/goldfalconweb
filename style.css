@@ -495,31 +495,51 @@ h1.glimmer-text {
 .red-candle .body { background: #f23645; border: 1px solid #f23645; }
 
 /* The layout is strictly bottom-up based on fixed pixel maps */
-.c1 { height: 100px; bottom: 50px; animation: popIn 10s infinite; }
+.c1 { height: 100px; bottom: 50px; animation: walkC1 8s infinite; }
 .c1 .wick { height: 60px; bottom: 0; }
 .c1 .body { height: 40px; bottom: 10px; }
 
-.c2 { height: 100px; bottom: 40px; animation: popIn 10s infinite 1s; }
+.c2 { height: 100px; bottom: 40px; animation: walkC2 8s infinite; }
 .c2 .wick { height: 50px; bottom: 0; }
 .c2 .body { height: 15px; bottom: 30px; }
 
-.c3 { height: 150px; bottom: 85px; animation: popIn 10s infinite 2s; }
+.c3 { height: 150px; bottom: 85px; animation: walkC3 8s infinite; }
 .c3 .wick { height: 90px; bottom: 0; }
 .c3 .body { height: 70px; bottom: 10px; }
 
-.c4 { height: 200px; bottom: 165px; animation: popIn 10s infinite 3s; }
+.c4 { height: 200px; bottom: 165px; animation: walkC4 8s infinite; }
 .c4 .wick { height: 80px; bottom: 0; }
 .c4 .body { height: 60px; bottom: 5px; }
 
-.c5 { height: 280px; bottom: 230px; animation: popIn 10s infinite 4s; }
+.c5 { height: 280px; bottom: 230px; animation: walkC5 8s infinite; }
 .c5 .wick { height: 100px; bottom: 0; }
 .c5 .body { height: 70px; bottom: 15px; }
 
-/* Instant pop-in like real chart ticks. Disappear rigidly at 9s mark. */
-@keyframes popIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    5%, 85% { opacity: 1; transform: translateY(0); }
-    86%, 100% { opacity: 0; }
+/* 8-second global loop */
+@keyframes walkC1 {
+    0%, 2% { opacity: 0; transform: translateY(10px); }
+    3%, 60% { opacity: 1; transform: translateY(0); }
+    61%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes walkC2 {
+    0%, 9% { opacity: 0; transform: translateY(10px); }
+    10%, 65% { opacity: 1; transform: translateY(0); }
+    66%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes walkC3 {
+    0%, 19% { opacity: 0; transform: translateY(10px); }
+    20%, 70% { opacity: 1; transform: translateY(0); }
+    71%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes walkC4 {
+    0%, 29% { opacity: 0; transform: translateY(10px); }
+    30%, 75% { opacity: 1; transform: translateY(0); }
+    76%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes walkC5 {
+    0%, 39% { opacity: 0; transform: translateY(10px); }
+    40%, 80% { opacity: 1; transform: translateY(0); }
+    81%, 100% { opacity: 0; transform: translateY(0); }
 }
 
 .tp-line {
