@@ -135,8 +135,8 @@ body {
 }
 
 .logo {
-    width: 110px;
-    height: 110px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     object-fit: contain;
     border: 2px solid var(--gold-primary);
@@ -152,15 +152,16 @@ body {
 
 .brand-text {
     font-family: 'Cinzel', serif;
-    font-size: 2.2rem;
+    font-size: 3.2rem;
     font-weight: 800;
     color: var(--gold-primary);
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .version-tag {
