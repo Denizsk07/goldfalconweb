@@ -386,6 +386,146 @@ h1.glimmer-text {
     50%, 100% { opacity: 0; }
 }
 
+/* Proof Section */
+.proof-section {
+    margin: 3rem auto;
+    max-width: 800px;
+}
+
+.proof-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.proof-card {
+    background: rgba(12, 17, 26, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.telegram-mock .tg-header {
+    background: #17212b;
+    padding: 10px 15px;
+    font-weight: 600;
+    color: #fff;
+    border-bottom: 1px solid #111;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.telegram-mock .tg-body {
+    background: #0e1621;
+    padding: 15px;
+    background-image: radial-gradient(circle at center, rgba(255,255,255,0.01) 0, transparent 100%);
+}
+
+.tg-msg {
+    background: #182533;
+    padding: 12px 16px;
+    border-radius: 12px 12px 12px 2px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #e4ecf2;
+    line-height: 1.6;
+    text-align: left;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.green-glow {
+    color: #00ff41;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+    display: block;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+}
+
+/* Chart Animation */
+.visual-mock {
+    background: #0b0f14;
+    padding: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.chart-animation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding-bottom: 20px;
+}
+
+.bar {
+    width: 30px;
+    background: linear-gradient(to top, rgba(212, 175, 55, 0.4), var(--gold-primary));
+    border-radius: 4px 4px 0 0;
+    opacity: 0;
+}
+
+.bar-1 { height: 30px; animation: riseBar 4s infinite 0s; }
+.bar-2 { height: 80px; animation: riseBar 4s infinite 0.5s; background: linear-gradient(to top, rgba(0, 255, 65, 0.4), #00ff41);}
+.bar-3 { height: 160px; animation: riseBar 4s infinite 1s; background: linear-gradient(to top, rgba(0, 255, 65, 0.5), #00ff41); box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);}
+
+@keyframes riseBar {
+    0% { height: 5px; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { height: 5px; opacity: 0; }
+}
+
+.tp-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    border-top: 1px dashed rgba(0, 255, 65, 0.5);
+    left: 0;
+    display: flex;
+    align-items: center;
+}
+
+.entry-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    left: 0;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.entry-line span, .tp-line span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    position: absolute;
+    right: 5px;
+    transform: translateY(-50%);
+}
+
+.entry-line span { background: #333; color: #fff; }
+.tp-line span { background: rgba(0, 255, 65, 0.15); color: #00ff41; border: 1px solid rgba(0, 255, 65, 0.3); }
+
+.tp1 { bottom: 60px; }
+.tp2 { bottom: 110px; }
+.tp3 { bottom: 180px; }
+
 /* Action Area */
 .action-area {
     margin-top: 2rem;
@@ -454,7 +594,7 @@ h1.glimmer-text {
 
 /* Responsive */
 @media (max-width: 900px) {
-    .capabilities-grid {
+    .capabilities-grid, .proof-grid {
         grid-template-columns: 1fr;
     }
     
