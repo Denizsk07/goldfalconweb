@@ -389,26 +389,28 @@ h1.glimmer-text {
     height: 100%;
 }
 
-.sell-chart {
+.buy-chart {
     width: 100%;
-    height: 300px;
+    height: 330px;
     position: relative;
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
 }
 
 .candles-container {
     display: flex;
-    gap: 15px;
-    margin-left: 20%;
-    margin-top: 30px; /* Starting near entry */
+    gap: 12px;
+    margin-left: 15%;
+    margin-bottom: 0; 
     position: relative;
+    height: 100%;
+    align-items: flex-end;
     z-index: 10;
 }
 
 .candle {
     position: relative;
-    width: 18px;
+    width: 14px;
     display: flex;
     justify-content: center;
     opacity: 0;
@@ -417,47 +419,58 @@ h1.glimmer-text {
 .candle .wick {
     position: absolute;
     width: 2px;
+    bottom: 0;
     z-index: 1;
 }
 
 .candle .body {
-    position: relative;
+    position: absolute;
     width: 100%;
-    border-radius: 2px;
+    border-radius: 1px;
     z-index: 2;
 }
 
-.green-candle .wick { background: #00ff41; height: 100%; }
-.green-candle .body { background: #00ff41; box-shadow: 0 0 10px rgba(0,255,65,0.3); border: 1px solid #11ff55; }
+.green-candle .wick { background: #089981; }
+.green-candle .body { background: #089981; border: 1px solid #089981; box-shadow: 0 0 8px rgba(8, 153, 129, 0.5); }
 
-.red-candle .wick { background: #ff5f56; height: 100%; }
-.red-candle .body { background: #ff5f56; box-shadow: 0 0 12px rgba(255,95,86,0.4); border: 1px solid #ff7f77; }
+.red-candle .wick { background: #f23645; }
+.red-candle .body { background: #f23645; border: 1px solid #f23645; }
 
-/* The sequence of a drop */
-.c1 { height: 40px; margin-top: -10px; animation: popCandle 6s infinite 0.5s; }
-.c1 .body { height: 20px; margin-top: 0; }
+/* Sequence of pushing UP */
+/* c1: Red drop into Entry */
+.c1 { height: 100px; animation: stayCandle 6s infinite 0s; bottom: 50px; }
+.c1 .wick { height: 60px; bottom: 0; }
+.c1 .body { height: 40px; bottom: 10px; }
 
-.c2 { height: 35px; margin-top: -25px; animation: popCandle 6s infinite 1.5s; }
-.c2 .body { height: 15px; margin-top: 15px; }
+/* c2: Bullish Pinbar (Sweep) at Entry */
+.c2 { height: 100px; animation: stayCandle 6s infinite 0.7s; bottom: 40px; }
+.c2 .wick { height: 50px; bottom: 0; }
+.c2 .body { height: 15px; bottom: 30px; }
 
-.c3 { height: 90px; margin-top: -5px; animation: popCandle 6s infinite 2.2s; }
-.c3 .body { height: 80px; margin-top: 5px; }
+/* c3: Big Green push hitting TP1 */
+.c3 { height: 150px; animation: stayCandle 6s infinite 1.4s; bottom: 85px; }
+.c3 .wick { height: 90px; bottom: 0; }
+.c3 .body { height: 70px; bottom: 10px; }
 
-.c4 { height: 80px; margin-top: 70px; animation: popCandle 6s infinite 2.9s; }
-.c4 .body { height: 70px; margin-top: 0; }
+/* c4: Continuation hitting TP2 */
+.c4 { height: 200px; animation: stayCandle 6s infinite 2.1s; bottom: 165px; }
+.c4 .wick { height: 80px; bottom: 0; }
+.c4 .body { height: 60px; bottom: 5px; }
 
-.c5 { height: 110px; margin-top: 135px; animation: wickCandle 6s infinite 3.5s; }
-.c5 .body { height: 60px; margin-top: 10px; }
+/* c5: Massive blast through TP3 */
+.c5 { height: 280px; animation: wickCandle 6s infinite 2.8s; bottom: 230px;}
+.c5 .wick { height: 100px; bottom: 0; }
+.c5 .body { height: 70px; bottom: 15px; }
 
-@keyframes popCandle {
-    0%, 10% { opacity: 0; transform: translateY(-10px); }
-    15%, 85% { opacity: 1; transform: translateY(0); }
+@keyframes stayCandle {
+    0%, 5% { opacity: 0; transform: scaleY(0.1); transform-origin: bottom; }
+    10%, 90% { opacity: 1; transform: scaleY(1); }
     100% { opacity: 0; }
 }
 
 @keyframes wickCandle {
-    0%, 5% { opacity: 0; }
-    10%, 85% { opacity: 1; }
+    0%, 5% { opacity: 0; transform: scaleY(0.1); transform-origin: bottom; }
+    10%, 90% { opacity: 1; transform: scaleY(1); }
     100% { opacity: 0; }
 }
 
@@ -478,7 +491,7 @@ h1.glimmer-text {
     height: 1px;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     left: 0;
-    top: 50px;
+    bottom: 50px;
     display: flex;
     align-items: center;
     z-index: 5;
@@ -496,11 +509,12 @@ h1.glimmer-text {
 }
 
 .entry-line span { background: #333; color: #fff; }
-.tp-line span { background: rgba(0, 255, 65, 0.15); color: #00ff41; border: 1px solid rgba(0, 255, 65, 0.3); }
+.tp-line span { background: rgba(0, 255, 65, 0.15); color: #089981; border: 1px solid rgba(8, 153, 129, 0.5); }
+.green-glow { color: #089981; text-shadow: 0 0 8px rgba(8, 153, 129, 0.3); }
 
-.tp1 { top: 120px; }
-.tp2 { top: 190px; }
-.tp3 { top: 260px; }
+.tp1 { bottom: 120px; }
+.tp2 { bottom: 190px; }
+.tp3 { bottom: 260px; }
 
 /* Action Area */
 .action-area {
