@@ -203,12 +203,12 @@ h1.glimmer-text {
 }
 
 .subtitle {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     color: var(--text-muted);
     margin-bottom: 2.5rem;
     font-weight: 300;
     line-height: 1.7;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.5px;
 }
 
 .hype {
