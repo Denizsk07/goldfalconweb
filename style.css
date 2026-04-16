@@ -202,11 +202,12 @@ h1.glimmer-text {
 }
 
 .subtitle {
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: var(--text-muted);
-    margin-bottom: 2rem;
-    font-weight: 400;
-    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+    line-height: 1.7;
+    letter-spacing: 0.2px;
 }
 
 .hype {
@@ -358,15 +359,22 @@ h1.glimmer-text {
 
 .tg-msg {
     background: #182533;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 12px 12px 12px 2px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
     color: #e4ecf2;
-    line-height: 1.6;
+    line-height: 1.7;
     text-align: left;
     display: inline-block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    letter-spacing: -0.2px;
+}
+
+.tg-msg strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
 }
 
 .green-glow {
