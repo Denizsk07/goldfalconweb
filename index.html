@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldFalcon — XAUUSD Smart Money Signale</title>
+<meta name="description" content="GoldFalcon scannt den Gold-Chart vollautomatisch nach Smart Money Concepts und liefert maximal 5 gefilterte Signale pro Tag — mit Entry, Stop-Loss und drei Profit-Zielen direkt auf Telegram.">
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+
+<!-- ======= NAV ======= -->
+<nav class="nav">
+  <a href="#top" class="nav-brand">
+    <img src="logo.jpg" alt="GoldFalcon" class="nav-logo">
+    <span>GOLD<em>FALCON</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="#engine">Engine</a>
+    <a href="#signal">Signal</a>
+    <a href="#risiko">Risiko-Regeln</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="#zugang" class="btn btn-small">Zugang sichern</a>
+</nav>
+
+<!-- ======= HERO ======= -->
+<header class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="hero-path" viewBox="0 0 1200 500" preserveAspectRatio="none">
+      <path d="M0,380 L90,360 L150,395 L230,330 L300,350 L370,290 L430,310 L520,240 L590,265 L660,205 L740,230 L820,160 L890,185 L960,120 L1040,145 L1120,80 L1200,100" />
+    </svg>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="badge">
+        <span class="dot"></span> Engine live · XAUUSD · Berlin-Sessions
+      </div>
+      <h1>Der Gold-Chart wird <span class="gold-em">institutionell</span> gelesen.<br>Du bekommst nur das Ergebnis.</h1>
+      <p class="lede">
+        GoldFalcon analysiert XAUUSD rund um die Uhr nach Smart-Money-Logik: Liquidity Sweeps,
+        Structure Breaks, Session-Levels. Jedes Setup durchläuft eine mehrstufige Filter-Pipeline —
+        nur was besteht, landet als fertiges Signal mit Entry, Stop-Loss und drei Zielen auf deinem Telegram.
+      </p>
+      <div class="hero-actions">
+        <a href="#zugang" class="btn btn-gold">Early Access sichern</a>
+        <a href="#engine" class="btn btn-ghost">Wie die Engine arbeitet</a>
+      </div>
+      <ul class="hero-facts">
+        <li><strong>max. 5</strong><span>Signale / Tag — hartes Limit</span></li>
+        <li><strong>3 Ziele</strong><span>+ Runner mit ATR-Trailing</span></li>
+        <li><strong>News-Blackout</strong><span>vor USD-High-Impact-Events</span></li>
+      </ul>
+    </div>
+
+    <!-- Signature: Engine-Terminal -->
+    <div class="terminal" id="terminal" aria-label="GoldFalcon Entscheidungs-Pipeline (Demo)">
+      <div class="terminal-bar">
+        <span class="t-title">GOLDFALCON · DECISION PIPELINE</span>
+        <span class="t-session">NY SESSION</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line" data-step="1"><span class="t-key">SETUP</span><span class="t-val">Breakout-Retest @ London High</span><span class="t-state"></span></div>
+        <div class="t-line" data-step="2"><span class="t-key">SPREAD</span><span class="t-val">2.1p — innerhalb Limit</span><span class="t-state"></span></div>
+        <div class="t-line" data-step="3"><span class="t-key">NEWS</span><span class="t-val">kein USD-Event in Blackout-Fenster</span><span class="t-state"></span></div>
+        <div class="t-line" data-step="4"><span class="t-key">SESSION BIAS</span><span class="t-val">BULLISH — Sweep &amp; Reclaim bestätigt</span><span class="t-state"></span></div>
+        <div class="t-line" data-step="5"><span class="t-key">LEVEL</span><span class="t-val">frisch, nicht konsumiert · Headroom ok</span><span class="t-state"></span></div>
+        <div class="t-line" data-step="6"><span class="t-key">SCORE</span><span class="t-val">8 / 10 — Grade A</span><span class="t-state"></span></div>
+        <div class="t-verdict" data-step="7">▸ SIGNAL FREIGEGEBEN</div>
+      </div>
+
+      <div class="tg-card" data-step="8">
+        <div class="tg-top"><img src="logo.jpg" alt="" class="tg-avatar"><span>GoldFalcon Signals</span><span class="tg-time">14:32</span></div>
+        <div class="tg-msg">
+          <div class="tg-head buy">🟢 XAUUSD BUY</div>
+          <div class="tg-row"><span>Session</span><b>NEW YORK</b></div>
+          <div class="tg-row"><span>Entry</span><b>2341.50</b></div>
+          <div class="tg-row sl"><span>SL</span><b>2335.50 &nbsp;(−60p)</b></div>
+          <div class="tg-row tp"><span>TP1</span><b>2344.50 &nbsp;(+30p)</b></div>
+          <div class="tg-row tp"><span>TP2</span><b>2347.50 &nbsp;(+60p)</b></div>
+          <div class="tg-row tp"><span>TP3</span><b>2350.50 &nbsp;(+90p)</b></div>
+          <div class="tg-row runner"><span>Runner</span><b>ATR-Trailing aktiv</b></div>
+        </div>
+        <div class="tg-hit">✓ TP2 erreicht — Position auf Break-Even</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ======= SESSION STRIP ======= -->
+<section class="sessions">
+  <div class="sessions-inner">
+    <span class="sessions-label">Handelsfenster<br>(Berlin-Zeit)</span>
+    <div class="session-track">
+      <div class="s-block asia"><b>ASIA</b><span>01:00 – 09:00</span></div>
+      <div class="s-block london"><b>LONDON</b><span>09:00 – 14:00</span></div>
+      <div class="s-block ny"><b>NEW YORK</b><span>14:00 – 20:00</span></div>
+    </div>
+    <span class="sessions-note">Ab 20:00 Uhr: harter Cutoff.<br>Keine Signale über Nacht.</span>
+  </div>
+</section>
+
+<!-- ======= ENGINE / HOW IT WORKS ======= -->
+<section class="section" id="engine">
+  <div class="section-head">
+    <span class="eyebrow">Die Engine</span>
+    <h2>Kein Indikator-Spielzeug.<br>Ein Regelwerk, das Setups aussortiert.</h2>
+    <p>Die meisten Bots suchen Gründe zu traden. GoldFalcon sucht Gründe, es <em>nicht</em> zu tun — und handelt nur, wenn keiner übrig bleibt.</p>
+  </div>
+
+  <div class="steps">
+    <article class="step">
+      <span class="step-n">SCAN</span>
+      <h3>Struktur &amp; Liquidität lesen</h3>
+      <p>M15/M5-Marktstruktur, Session-Highs und -Lows, Equal Highs/Lows, Range-Erkennung. Die Engine trackt permanent, wo Liquidität liegt — und ob ein Level bereits konsumiert wurde. Kein Level wird zweimal gehandelt.</p>
+    </article>
+    <article class="step">
+      <span class="step-n">FILTER</span>
+      <h3>Die Pipeline entscheidet</h3>
+      <p>Spread-Check, ATR-Volatilitätsfilter, Momentum-Alarm, Zone-Lockout, Liquidity-Blocker, Tagesbudget, 15-Minuten-Cooldown und News-Blackout vor USD-Events. Jedes Setup bekommt einen Quality-Score — unter der Schwelle wird verworfen.</p>
+    </article>
+    <article class="step">
+      <span class="step-n">SIGNAL</span>
+      <h3>Fertig aufbereitet auf Telegram</h3>
+      <p>Entry, Stop-Loss, TP1/TP2/TP3 und Runner-Management stehen im Signal — sekundenschnell nach Freigabe. Optional führt der Bot die Trades über MetaTrader 5 komplett selbst aus, inklusive Break-Even und ATR-Trailing.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ======= FEATURE GRID ======= -->
+<section class="section section-alt">
+  <div class="section-head">
+    <span class="eyebrow">Unter der Haube</span>
+    <h2>Gebaut wie ein Prop-Desk, nicht wie ein Indikator.</h2>
+  </div>
+  <div class="features">
+    <article class="feature">
+      <h3>Session-Bias-Engine</h3>
+      <p>Vor jedem Trade wird die Richtung der Session bestimmt: Sweep &amp; Reclaim, Displacement, Position zum Daily Open, Draw on Liquidity. Gegen den Bias wird nur in klar definierten Ausnahmen gehandelt.</p>
+    </article>
+    <article class="feature">
+      <h3>Strategie-Router</h3>
+      <p>Trend-Pullback, Breakout-Retest und Counter-Correction — die Engine wählt das Playbook, das zur aktuellen Marktphase passt, statt eine Strategie stur auf jede Lage zu pressen.</p>
+    </article>
+    <article class="feature">
+      <h3>News-Blackout</h3>
+      <p>Vor USD-High-Impact-Events (NFP, CPI, FOMC) schaltet der Bot automatisch ab. Der Kalender wird laufend aktualisiert — kein Entry in einen Nachrichten-Spike.</p>
+    </article>
+    <article class="feature">
+      <h3>Trade-Management</h3>
+      <p>Jedes Signal wird auf vier Positionen aufgeteilt: TP1 (+30p), TP2 (+60p), TP3 (+90p) und ein Runner mit ATR-Trailing-Stop. Break-Even-Logik sichert Gewinne, während der Runner Trends ausreizt.</p>
+    </article>
+    <article class="feature">
+      <h3>Level-Gedächtnis</h3>
+      <p>Ein State-Machine-System merkt sich jedes Key-Level über Asia-, London- und NY-Session hinweg: unberührt, getestet, akzeptiert, konsumiert. Abgegriffene Zonen werden nie erneut gehandelt.</p>
+    </article>
+    <article class="feature">
+      <h3>Hartes Risiko-Korsett</h3>
+      <p>Maximal 5 Signale pro Tag, fester Session-Stop-Loss, Mindest-R:R pro Setup-Typ, Cooldown nach jedem Signal. Übertrading ist systemseitig unmöglich.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ======= SIGNAL ANATOMY ======= -->
+<section class="section" id="signal">
+  <div class="section-head">
+    <span class="eyebrow">Das Signal</span>
+    <h2>Jede Zeile hat einen Job.</h2>
+    <p>Du bekommst keine vagen „Zonen" oder „Ideen" — sondern einen vollständigen Trade-Plan, den du in unter 30 Sekunden umsetzen kannst.</p>
+  </div>
+
+  <div class="anatomy">
+    <div class="anatomy-msg">
+      <div class="tg-top"><img src="logo.jpg" alt="" class="tg-avatar"><span>GoldFalcon Signals</span></div>
+      <div class="tg-msg static">
+        <div class="tg-head sell">🔴 XAUUSD SELL</div>
+        <div class="tg-row" data-a="1"><span>Session</span><b>LONDON</b></div>
+        <div class="tg-row" data-a="2"><span>Entry</span><b>2358.20</b></div>
+        <div class="tg-row sl" data-a="3"><span>SL</span><b>2364.20 (−60p)</b></div>
+        <div class="tg-row tp" data-a="4"><span>TP1</span><b>2355.20 (+30p)</b></div>
+        <div class="tg-row tp" data-a="4"><span>TP2</span><b>2352.20 (+60p)</b></div>
+        <div class="tg-row tp" data-a="4"><span>TP3</span><b>2349.20 (+90p)</b></div>
+        <div class="tg-row runner" data-a="5"><span>Runner</span><b>ATR-Trailing</b></div>
+      </div>
+    </div>
+    <ol class="anatomy-notes">
+      <li><b>Session-Kontext.</b> Du siehst sofort, in welchem Handelsfenster das Setup entstanden ist — und welcher Session-SL gilt.</li>
+      <li><b>Exakter Entry.</b> Kein „Bereich um…". Ein Preis, an dem die Engine Struktur, Level und Bias zusammengeführt hat.</li>
+      <li><b>Fester Stop-Loss.</b> Session-abhängig vordefiniert. Dein maximales Risiko steht fest, bevor du klickst.</li>
+      <li><b>Drei gestaffelte Ziele.</b> Teilgewinne bei +30/+60/+90 Pips — die Position wird planmäßig abgebaut statt gehofft.</li>
+      <li><b>Runner-Logik.</b> Ein Teil läuft mit ATR-Trailing weiter und nimmt die großen Bewegungen mit, ohne den gesicherten Gewinn zu riskieren.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======= TRANSPARENCY ======= -->
+<section class="section section-alt" id="risiko">
+  <div class="section-head">
+    <span class="eyebrow">Klartext</span>
+    <h2>Was GoldFalcon <span class="strike">nicht</span> macht.</h2>
+    <p>Der Signal-Markt ist voll mit Versprechen. Hier ist, wovon dieser Bot bewusst die Finger lässt:</p>
+  </div>
+  <div class="nots">
+    <div class="not"><span class="not-x">✕</span><div><b>Kein Martingale, kein Grid.</b><p>Keine Verdopplung nach Verlusten, keine offenen Positionsnetze. Jeder Trade steht für sich, mit festem Risiko.</p></div></div>
+    <div class="not"><span class="not-x">✕</span><div><b>Keine 90 %-Winrate-Märchen.</b><p>Verlust-Trades gehören zum System. Der Edge liegt in Selektion und Trade-Management — nicht in unrealistischen Quoten.</p></div></div>
+    <div class="not"><span class="not-x">✕</span><div><b>Kein Signal-Spam.</b><p>An Tagen ohne sauberes Setup kommt: nichts. Null Signale sind ein Feature, kein Fehler.</p></div></div>
+    <div class="not"><span class="not-x">✕</span><div><b>Kein Trading in News-Spikes.</b><p>Vor High-Impact-Events ist die Engine offline. Der schnellste Weg, ein Konto zu zerstören, wird gar nicht erst betreten.</p></div></div>
+  </div>
+</section>
+
+<!-- ======= ACCESS / PRICING ======= -->
+<section class="section" id="zugang">
+  <div class="access">
+    <div class="access-copy">
+      <span class="eyebrow">Zugang</span>
+      <h2>Einmal zahlen.<br>Kein Abo. Kein Kleingedrucktes.</h2>
+      <p>GoldFalcon startet in einer limitierten Early-Access-Runde. Wer dabei ist, bekommt den vollen Signal-Zugang zum Einmalpreis — bevor das Abo-Modell für spätere Runden kommt.</p>
+      <ul class="access-list">
+        <li>Alle XAUUSD-Signale im privaten Telegram-Kanal</li>
+        <li>Vollständiger Trade-Plan: Entry, SL, TP1–TP3, Runner</li>
+        <li>Tägliches Engine-Log: was gehandelt wurde — und was warum nicht</li>
+        <li>Setup-Anleitung für manuelles Trading &amp; MT5</li>
+      </ul>
+    </div>
+    <div class="price-card">
+      <span class="price-tag">EARLY ACCESS · LIMITIERT</span>
+      <div class="price"><span class="cur">€</span>497<span class="once">einmalig</span></div>
+      <p class="price-sub">Lebenslanger Zugang für die erste Runde.<br>Danach: Abo-Modell zum höheren Preis.</p>
+      <a class="btn btn-gold btn-block" href="https://t.me/goldfalcon" rel="noopener">Platz auf der Warteliste sichern</a>
+      <span class="price-note">Kanal öffnet in Kürze — Warteliste wird zuerst freigeschaltet.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ======= FAQ ======= -->
+<section class="section section-alt" id="faq">
+  <div class="section-head">
+    <span class="eyebrow">FAQ</span>
+    <h2>Bevor du fragst.</h2>
+  </div>
+  <div class="faq">
+    <details>
+      <summary>Brauche ich Trading-Erfahrung?</summary>
+      <p>Du solltest wissen, wie man eine Order mit Stop-Loss und Take-Profit setzt. Alles Analytische — Struktur, Levels, Timing — übernimmt die Engine. Eine Schritt-für-Schritt-Anleitung ist enthalten.</p>
+    </details>
+    <details>
+      <summary>Funktioniert das mit meinem Broker?</summary>
+      <p>Ja. Die Signale sind broker-unabhängig — jeder Broker mit XAUUSD funktioniert. Für die optionale Auto-Ausführung wird MetaTrader 5 benötigt.</p>
+    </details>
+    <details>
+      <summary>Ist das für Prop-Firm-Challenges geeignet?</summary>
+      <p>Das Regelwerk ist auf Prop-Firm-Bedingungen ausgelegt: festes Risiko pro Trade, hartes Tageslimit, kein Trading über Nacht, News-Blackout. Prüfe trotzdem die Regeln deiner Prop-Firm — die Verantwortung für die Einhaltung liegt bei dir.</p>
+    </details>
+    <details>
+      <summary>Wie viele Signale kommen pro Tag?</summary>
+      <p>Zwischen 0 und 5. Das Limit von 5 ist im Code fest verankert. An Tagen ohne sauberes Setup gibt es bewusst kein Signal.</p>
+    </details>
+    <details>
+      <summary>Garantiert ihr Gewinne?</summary>
+      <p>Nein — und jeder, der das tut, lügt. Trading mit Hebelprodukten ist riskant und kann zum Totalverlust führen. GoldFalcon liefert ein diszipliniertes, regelbasiertes System; die Entscheidung und das Risiko bleiben bei dir.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ======= FINAL CTA ======= -->
+<section class="final">
+  <h2>Der Chart schläft nicht.<br><span class="gold-em">Die Engine auch nicht.</span></h2>
+  <a href="#zugang" class="btn btn-gold">Early Access sichern</a>
+</section>
+
+<!-- ======= FOOTER ======= -->
+<footer class="footer">
+  <div class="footer-brand">
+    <img src="logo.jpg" alt="GoldFalcon" class="nav-logo">
+    <span>GOLD<em>FALCON</em></span>
+  </div>
+  <p class="risk">
+    <b>Risikohinweis:</b> Der Handel mit CFDs, Devisen und Edelmetallen ist mit erheblichen Risiken verbunden und kann zum vollständigen Verlust des eingesetzten Kapitals führen. Vergangene Ergebnisse sind keine Garantie für zukünftige Resultate. GoldFalcon liefert keine Anlageberatung; alle Signale sind Informationsangebote, deren Umsetzung in eigener Verantwortung erfolgt. Handle nur mit Kapital, dessen Verlust du dir leisten kannst.
+  </p>
+  <div class="footer-links">
+    <a href="#">Impressum</a>
+    <a href="#">Datenschutz</a>
+    <span>© 2026 GoldFalcon</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
