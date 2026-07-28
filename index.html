@@ -219,9 +219,8 @@
 
   <div class="live-grid">
     <div class="live-chart-card">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-      </div>
+      <div id="gf-chart" class="gf-chart-mount"></div>
+      <div id="gf-chart-empty" class="zones-empty gf-chart-empty" hidden>Chart-Daten folgen, sobald die Engine den ersten Snapshot exportiert hat.</div>
     </div>
     <div class="zones-card">
       <div class="zones-block">
@@ -352,22 +351,7 @@
 <script src="config.js"></script>
 <script src="script.js"></script>
 <script src="zones.js"></script>
-<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-{
-  "autosize": true,
-  "symbol": "OANDA:XAUUSD",
-  "interval": "15",
-  "timezone": "Etc/UTC",
-  "theme": "dark",
-  "style": "1",
-  "locale": "de_DE",
-  "backgroundColor": "rgba(19, 23, 34, 1)",
-  "gridColor": "rgba(42, 46, 57, 1)",
-  "hide_top_toolbar": false,
-  "hide_legend": true,
-  "allow_symbol_change": false,
-  "support_host": "https://www.tradingview.com"
-}
-</script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="chart.js"></script>
 </body>
 </html>

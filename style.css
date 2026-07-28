@@ -380,11 +380,11 @@ h3{font-size:1.05rem;font-weight:700}
 .live-grid{ display:grid; grid-template-columns:1.6fr 1fr; gap:1.5rem; }
 .live-chart-card{
   background:#131722; border:1px solid var(--line-soft); border-radius:var(--radius);
-  overflow:hidden; min-height:420px;
+  overflow:hidden; min-height:420px; position:relative;
   box-shadow:0 24px 60px rgba(0,0,0,.5);
 }
-.live-chart-card .tradingview-widget-container,
-.live-chart-card .tradingview-widget-container__widget{ height:420px; width:100%; }
+.gf-chart-mount{ height:420px; width:100%; }
+.gf-chart-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; }
 
 .zones-card{ display:flex; flex-direction:column; gap:1.2rem; }
 .zones-block{
@@ -452,7 +452,7 @@ h3{font-size:1.05rem;font-weight:700}
   .s-block{padding:.7rem .9rem}
   .price{font-size:3.2rem}
   .session-perf-grid{grid-template-columns:1fr}
-  .live-chart-card,.live-chart-card .tradingview-widget-container,.live-chart-card .tradingview-widget-container__widget{height:300px;min-height:300px}
+  .live-chart-card,.gf-chart-mount{height:300px;min-height:300px}
 }
 
 @media(prefers-reduced-motion:reduce){
