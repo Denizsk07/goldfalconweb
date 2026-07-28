@@ -22,10 +22,19 @@
   <div class="nav-links">
     <a href="#engine">Engine</a>
     <a href="#signal">Signal</a>
+    <a href="#live">Live-Analyse</a>
     <a href="#risiko">Risiko-Regeln</a>
     <a href="#faq">FAQ</a>
   </div>
-  <a href="#zugang" class="btn btn-small">Zugang sichern</a>
+  <div class="nav-actions">
+    <a href="admin/login.html" class="nav-admin-link" title="Admin Login" aria-label="Admin Login">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </a>
+    <a href="#zugang" class="btn btn-small">Zugang sichern</a>
+  </div>
 </nav>
 
 <!-- ======= HERO ======= -->
@@ -200,6 +209,55 @@
   </div>
 </section>
 
+<!-- ======= LIVE CHART & ZONES ======= -->
+<section class="section section-alt" id="live">
+  <div class="section-head">
+    <span class="eyebrow">Live-Analyse</span>
+    <h2>Der Chart, den die Engine gerade liest.</h2>
+    <p>Live-XAUUSD-Chart plus die Key-Levels, die der Algorithmus aktuell für Entries und Ziele im Blick hat — heute und der Vortag.</p>
+  </div>
+
+  <div class="live-grid">
+    <div class="live-chart-card">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+      </div>
+    </div>
+    <div class="zones-card">
+      <div class="zones-block">
+        <h3>Zonen heute</h3>
+        <div id="zones-today" class="zones-list">
+          <div class="zones-loading">Lade Zonen...</div>
+        </div>
+      </div>
+      <div class="zones-block">
+        <h3>Zonen von gestern</h3>
+        <div id="zones-yesterday" class="zones-list">
+          <div class="zones-loading">Lade Zonen...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= PERFORMANCE / TRACK RECORD ======= -->
+<section class="section" id="performance-section">
+  <div class="section-head">
+    <span class="eyebrow">Track Record</span>
+    <h2>Kein Backtest. Live-Zahlen aus dem laufenden System.</h2>
+  </div>
+
+  <div class="performance-summary">
+    <div class="perf-pill"><span class="perf-val" id="stat-total-pips">–</span><span class="perf-lbl">Pips gesamt</span></div>
+    <div class="perf-pill"><span class="perf-val" id="stat-winrate">–</span><span class="perf-lbl">Trefferquote</span></div>
+    <span class="perf-note" id="stat-since">Live-Zahlen aus dem laufenden System</span>
+  </div>
+
+  <div class="session-perf-grid" id="session-perf-grid">
+    <div class="zones-loading">Lade Performance...</div>
+  </div>
+</section>
+
 <!-- ======= TRANSPARENCY ======= -->
 <section class="section section-alt" id="risiko">
   <div class="section-head">
@@ -291,6 +349,25 @@
   </div>
 </footer>
 
+<script src="config.js"></script>
 <script src="script.js"></script>
+<script src="zones.js"></script>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "autosize": true,
+  "symbol": "OANDA:XAUUSD",
+  "interval": "15",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "de_DE",
+  "backgroundColor": "rgba(19, 23, 34, 1)",
+  "gridColor": "rgba(42, 46, 57, 1)",
+  "hide_top_toolbar": false,
+  "hide_legend": true,
+  "allow_symbol_change": false,
+  "support_host": "https://www.tradingview.com"
+}
+</script>
 </body>
 </html>

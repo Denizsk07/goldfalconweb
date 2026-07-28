@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldFalcon — Admin Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="../logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css?v=10">
+    <link rel="stylesheet" href="admin.css?v=2">
+</head>
+<body class="admin-body">
+    <main class="admin-panel dashboard-panel">
+        <div class="dashboard-header">
+            <h1>GOLD<em style="color:var(--gold);font-style:normal">FALCON</em> — TRACKING</h1>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+
+        <div id="dashboard-loading" class="admin-loading">Lade Stats...</div>
+
+        <div id="dashboard-content" hidden>
+            <section class="stats-grid">
+                <div class="stat-panel">
+                    <h2>Heute (<span id="daily-date">-</span>)</h2>
+                    <div class="stat-numbers" id="daily-stats"></div>
+                    <div class="winrate-bar"><div class="winrate-bar-fill" id="daily-winrate-fill"></div></div>
+                    <div class="winrate-bar-lbl" id="daily-winrate-lbl"></div>
+                </div>
+                <div class="stat-panel">
+                    <h2>Lifetime (seit <span id="alltime-start">-</span>)</h2>
+                    <div class="stat-numbers" id="alltime-stats"></div>
+                    <div class="winrate-bar"><div class="winrate-bar-fill" id="alltime-winrate-fill"></div></div>
+                    <div class="winrate-bar-lbl" id="alltime-winrate-lbl"></div>
+                </div>
+            </section>
+
+            <section class="session-section">
+                <h2>Session Performance (Lifetime)</h2>
+                <div class="session-grid" id="session-grid-alltime">
+                    <div class="admin-loading">Lade Sessions...</div>
+                </div>
+                <h2 style="margin-top: 1.5rem;">Session Performance (Heute)</h2>
+                <div class="session-grid" id="session-grid-daily">
+                    <div class="admin-loading">Lade Sessions...</div>
+                </div>
+            </section>
+
+            <section class="shadow-section">
+                <h2>Shadow Tracking</h2>
+                <div class="shadow-filters">
+                    <select id="date-select"></select>
+                    <select id="kind-select">
+                        <option value="">Alle Arten</option>
+                        <option value="GATE">GATE</option>
+                        <option value="SETUP">SETUP</option>
+                    </select>
+                    <span class="shadow-count" id="shadow-count"></span>
+                </div>
+                <div class="shadow-table-wrap">
+                    <table class="shadow-table">
+                        <thead>
+                            <tr>
+                                <th>Zeit (UTC)</th>
+                                <th>Art</th>
+                                <th>Grund</th>
+                                <th>Richtung</th>
+                                <th>Preis</th>
+                                <th>Level</th>
+                                <th>Session</th>
+                                <th>Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shadow-tbody"></tbody>
+                    </table>
+                </div>
+                <div id="shadow-empty" class="admin-empty" hidden>Keine Einträge für diesen Tag.</div>
+                <button class="load-more-btn" id="load-more-btn" hidden>Mehr laden</button>
+            </section>
+        </div>
+    </main>
+
+    <script src="../config.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        const state = { date: null, kind: "", offset: 0, limit: 100, total: 0 };
+
+        function fmtNum(n, digits = 0) {
+            if (n === undefined || n === null) return "-";
+            return Number(n).toLocaleString("de-DE", { maximumFractionDigits: digits });
+        }
+
+        function renderStatCells(container, cells) {
+            container.innerHTML = cells
+                .map(
+                    (c) => `<div class="stat-cell"><div class="val ${c.cls || ""}">${c.val}</div><div class="lbl">${c.lbl}</div></div>`
+                )
+                .join("");
+        }
+
+        // Note: TP1-TP4 are partial-exit legs of the SAME signal, not separate
+        // signals — one signal can rack up multiple TP hits. Shown itemized
+        // (instead of summed into one "Wins" number) so that never reads as
+        // "more wins than signals".
+        function renderDailyStats(d) {
+            document.getElementById("daily-date").textContent = d.date || "-";
+            const wins = (d.tp1 || 0) + (d.tp2 || 0) + (d.tp3 || 0) + (d.tp4 || 0);
+            const total = wins + (d.sl || 0);
+            const winrate = total ? (wins / total) * 100 : 0;
+            renderStatCells(document.getElementById("daily-stats"), [
+                { val: fmtNum(d.signals), lbl: "Signale" },
+                { val: fmtNum(d.active), lbl: "Aktiv" },
+                { val: fmtNum(d.tp1), lbl: "TP1", cls: "pos" },
+                { val: fmtNum(d.tp2), lbl: "TP2", cls: "pos" },
+                { val: fmtNum(d.tp3), lbl: "TP3", cls: "pos" },
+                { val: fmtNum(d.tp4), lbl: "TP4", cls: "pos" },
+                { val: fmtNum(d.sl), lbl: "SL", cls: "neg" },
+                { val: fmtNum(d.be), lbl: "BE" },
+                { val: fmtNum(d.pips, 1), lbl: "Pips", cls: (d.pips || 0) >= 0 ? "pos" : "neg" },
+            ]);
+            document.getElementById("daily-winrate-fill").style.width = winrate + "%";
+            document.getElementById("daily-winrate-lbl").textContent = total
+                ? `${winrate.toFixed(1)}% Winrate (${wins} TP-Hits / ${d.sl || 0} SL)`
+                : "Noch keine entschiedenen Trades heute";
+        }
+
+        function renderAlltimeStats(a) {
+            document.getElementById("alltime-start").textContent = a.start_date || "-";
+            const wins = (a.tp1 || 0) + (a.tp2 || 0) + (a.tp3 || 0) + (a.tp4 || 0);
+            const total = wins + (a.sl || 0);
+            const winrate = total ? (wins / total) * 100 : 0;
+            renderStatCells(document.getElementById("alltime-stats"), [
+                { val: fmtNum(a.total_signals), lbl: "Signale" },
+                { val: winrate.toFixed(1) + "%", lbl: "Winrate", cls: "gold" },
+                { val: fmtNum(a.tp1), lbl: "TP1", cls: "pos" },
+                { val: fmtNum(a.tp2), lbl: "TP2", cls: "pos" },
+                { val: fmtNum(a.tp3), lbl: "TP3", cls: "pos" },
+                { val: fmtNum(a.tp4), lbl: "TP4", cls: "pos" },
+                { val: fmtNum(a.sl), lbl: "SL", cls: "neg" },
+                { val: fmtNum(a.be), lbl: "BE" },
+                { val: fmtNum(a.total_pips, 1), lbl: "Pips", cls: (a.total_pips || 0) >= 0 ? "pos" : "neg" },
+            ]);
+            document.getElementById("alltime-winrate-fill").style.width = winrate + "%";
+            document.getElementById("alltime-winrate-lbl").textContent = total
+                ? `${winrate.toFixed(1)}% Winrate (${wins} TP-Hits / ${a.sl || 0} SL)`
+                : "Noch keine entschiedenen Trades";
+        }
+
+        function renderSessionGrid(containerId, sessions) {
+            const el = document.getElementById(containerId);
+            if (!sessions || !sessions.length) {
+                el.innerHTML = '<div class="admin-empty">Noch keine Session-Daten für diesen Zeitraum.</div>';
+                return;
+            }
+            el.innerHTML = sessions
+                .map(
+                    (s) => `<div class="session-box session-${s.session}">
+                        <div class="session-label">${s.label}</div>
+                        <div class="session-winrate">${s.winrate}%</div>
+                        <div class="session-sub">${s.trades} Trades &middot; ${s.wins}W / ${s.losses}L / ${s.be}BE</div>
+                        <div class="session-pips ${s.pips >= 0 ? "pos" : "neg"}">${s.pips >= 0 ? "+" : ""}${fmtNum(s.pips, 1)} Pips</div>
+                    </div>`
+                )
+                .join("");
+        }
+
+        function kindBadge(kind) {
+            const cls = kind === "SETUP" ? "badge-setup" : "badge-gate";
+            return `<span class="badge ${cls}">${kind}</span>`;
+        }
+
+        function outcomeBadge(outcome) {
+            if (!outcome || outcome === "NONE") return "-";
+            const cls = outcome.startsWith("TP") ? "badge-tp" : outcome === "SL" ? "badge-sl" : "badge-gate";
+            return `<span class="badge ${cls}">${outcome}</span>`;
+        }
+
+        function renderShadowRows(items, append) {
+            const tbody = document.getElementById("shadow-tbody");
+            const rows = items
+                .map(
+                    (e) => `<tr>
+                        <td>${e.timestamp || "-"}</td>
+                        <td>${kindBadge(e.kind)}</td>
+                        <td>${e.reason || "-"}</td>
+                        <td>${e.direction || "-"}</td>
+                        <td>${e.price_snapshot ? fmtNum(e.price_snapshot, 2) : "-"}</td>
+                        <td>${e.level_name || "-"}</td>
+                        <td>${e.session || "-"}</td>
+                        <td>${outcomeBadge(e.outcome)}</td>
+                    </tr>`
+                )
+                .join("");
+            tbody.innerHTML = append ? tbody.innerHTML + rows : rows;
+        }
+
+        async function loadShadow(append = false) {
+            const data = await gfApiFetch(
+                `/api/shadow/${state.date}?kind=${state.kind}&limit=${state.limit}&offset=${state.offset}`
+            );
+            state.total = data.total;
+            renderShadowRows(data.items, append);
+
+            const loadedCount = document.getElementById("shadow-tbody").rows.length;
+            document.getElementById("shadow-count").textContent = `${loadedCount} / ${data.total} geladen`;
+            document.getElementById("shadow-empty").hidden = data.total > 0;
+            document.getElementById("load-more-btn").hidden = loadedCount >= data.total;
+        }
+
+        async function init() {
+            const me = await gfRequireAuth();
+            if (!me) return;
+
+            const [daily, alltime, sessions, shadowDates] = await Promise.all([
+                gfApiFetch("/api/stats/daily"),
+                gfApiFetch("/api/stats/alltime"),
+                gfApiFetch("/api/stats/sessions"),
+                gfApiFetch("/api/shadow/dates"),
+            ]);
+
+            renderDailyStats(daily);
+            renderAlltimeStats(alltime);
+            renderSessionGrid("session-grid-alltime", sessions.alltime);
+            renderSessionGrid("session-grid-daily", sessions.daily);
+
+            const dateSelect = document.getElementById("date-select");
+            dateSelect.innerHTML = shadowDates.dates.map((d) => `<option value="${d}">${d}</option>`).join("");
+            state.date = shadowDates.dates[0] || null;
+
+            if (state.date) {
+                await loadShadow();
+            } else {
+                document.getElementById("shadow-empty").hidden = false;
+            }
+
+            document.getElementById("dashboard-loading").hidden = true;
+            document.getElementById("dashboard-content").hidden = false;
+
+            dateSelect.addEventListener("change", async (e) => {
+                state.date = e.target.value;
+                state.offset = 0;
+                await loadShadow(false);
+            });
+            document.getElementById("kind-select").addEventListener("change", async (e) => {
+                state.kind = e.target.value;
+                state.offset = 0;
+                await loadShadow(false);
+            });
+            document.getElementById("load-more-btn").addEventListener("click", async () => {
+                state.offset += state.limit;
+                await loadShadow(true);
+            });
+            document.getElementById("logout-btn").addEventListener("click", gfLogout);
+        }
+
+        init().catch((e) => {
+            document.getElementById("dashboard-loading").textContent = "Fehler beim Laden: " + e.message;
+        });
+    </script>
+</body>
+</html>

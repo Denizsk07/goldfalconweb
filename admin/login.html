@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldFalcon — Admin Login</title>
+    <link rel="icon" type="image/jpeg" href="../logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css?v=10">
+    <link rel="stylesheet" href="admin.css?v=2">
+</head>
+<body class="admin-body">
+    <main class="admin-panel login-panel">
+        <div class="login-brand">
+            <img src="../logo.jpg" alt="GoldFalcon">
+            <span>GOLD<em>FALCON</em></span>
+            <small>Admin</small>
+        </div>
+
+        <form id="login-form" class="login-form">
+            <label class="admin-label" for="username">Benutzername</label>
+            <input class="admin-input" type="text" id="username" name="username" autocomplete="username" required>
+
+            <label class="admin-label" for="password">Passwort</label>
+            <input class="admin-input" type="password" id="password" name="password" autocomplete="current-password" required>
+
+            <div id="login-error" class="login-error" hidden></div>
+
+            <button type="submit" class="btn btn-gold admin-submit-btn">
+                <span id="login-btn-text">Login</span>
+            </button>
+        </form>
+
+        <a href="../index.html" class="back-link">&larr; Zur Website</a>
+    </main>
+
+    <script src="../config.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+            const errorEl = document.getElementById("login-error");
+            const btnText = document.getElementById("login-btn-text");
+            errorEl.hidden = true;
+            btnText.textContent = "Prüfe...";
+
+            try {
+                const res = await fetch(window.GF_API_BASE + "/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                });
+                if (!res.ok) {
+                    throw new Error(res.status === 429 ? "Zu viele Versuche, bitte kurz warten." : "Login fehlgeschlagen.");
+                }
+                const data = await res.json();
+                gfSetToken(data.token);
+                window.location.href = "dashboard.html";
+            } catch (err) {
+                errorEl.textContent = err.message || "Login fehlgeschlagen.";
+                errorEl.hidden = false;
+                btnText.textContent = "Login";
+            }
+        });
+
+        // Already logged in? Skip straight to the dashboard.
+        if (gfGetToken()) {
+            window.location.href = "dashboard.html";
+        }
+    </script>
+</body>
+</html>
