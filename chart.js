@@ -51,10 +51,17 @@ function gfAddLineLevels(series, levels, defs) {
     });
 }
 
+const GF_BOX_LABELS = {
+    asia: "ASIA", london: "LONDON", ny: "NY",
+    "asia-y": "ASIA", "london-y": "LONDON", "ny-y": "NY",
+};
+
 // Session ranges get a shaded CSS box over the chart, anchored to both
 // their price range (series.priceToCoordinate) and their real session time
 // window (chart.timeScale().timeToCoordinate) — lightweight-charts v4 has
-// no native rectangle primitive, so this is redrawn on every pan/zoom.
+// no native rectangle primitive, so this is redrawn continuously (see
+// gfStartRedrawLoop) to track the chart's own pan/zoom animation frame by
+// frame instead of only on "settled" range-change events.
 function gfBuildBoxes(levels, windows, boxDefs, overlay) {
     const boxes = [];
     boxDefs.forEach((def) => {
@@ -65,9 +72,13 @@ function gfBuildBoxes(levels, windows, boxDefs, overlay) {
 
         const el = document.createElement("div");
         el.className = "gf-zone-box gf-zone-" + def.cls;
+        const label = document.createElement("span");
+        label.className = "gf-zone-box-label";
+        label.textContent = GF_BOX_LABELS[def.cls] || "";
+        el.appendChild(label);
         overlay.appendChild(el);
 
-        boxes.push({ el, high, low, startTs: win.start, endTs: win.end });
+        boxes.push({ el, label, high, low, startTs: win.start, endTs: win.end });
     });
     return boxes;
 }
@@ -81,8 +92,10 @@ function gfClampToVisibleRange(chart, ts) {
 function gfPositionBoxes(chart, series, boxes, overlay) {
     try {
         overlay.style.right = chart.priceScale("right").width() + "px";
-    } catch (e) {}
-    boxes.forEach(({ el, high, low, startTs, endTs }) => {
+    } catch (e) {
+        return;
+    }
+    boxes.forEach(({ el, label, high, low, startTs, endTs }) => {
         const yHigh = series.priceToCoordinate(high);
         const yLow = series.priceToCoordinate(low);
         const xStart = chart.timeScale().timeToCoordinate(gfClampToVisibleRange(chart, startTs));
@@ -91,12 +104,33 @@ function gfPositionBoxes(chart, series, boxes, overlay) {
             el.style.display = "none";
             return;
         }
+        const width = xEnd - xStart;
         el.style.display = "block";
         el.style.top = Math.min(yHigh, yLow) + "px";
         el.style.height = Math.max(2, Math.abs(yLow - yHigh)) + "px";
         el.style.left = xStart + "px";
-        el.style.width = (xEnd - xStart) + "px";
+        el.style.width = width + "px";
+        // Hide the label once the box gets too narrow for it to fit cleanly.
+        label.style.display = width >= 46 ? "block" : "none";
     });
+}
+
+// Keep the DOM box overlay glued to the chart on every rendered frame,
+// including mid-animation frames during a mouse-wheel zoom or drag-pan —
+// lightweight-charts eases those internally, and relying only on the
+// "settled" subscribeVisibleLogicalRangeChange event left the boxes visibly
+// lagging behind the candles while the chart was still animating.
+function gfStartRedrawLoop(chart, series, boxes, overlay) {
+    let running = true;
+    function loop() {
+        if (!running) return;
+        gfPositionBoxes(chart, series, boxes, overlay);
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    return () => {
+        running = false;
+    };
 }
 
 async function gfInitChart() {
@@ -173,13 +207,8 @@ async function gfInitChart() {
         ...gfBuildBoxes(yesterdayLevels, yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
     ];
 
-    const redraw = () => gfPositionBoxes(chart, series, boxes, overlay);
-    chart.timeScale().subscribeVisibleLogicalRangeChange(redraw);
-    window.addEventListener("resize", () => setTimeout(redraw, 60));
-
+    gfStartRedrawLoop(chart, series, boxes, overlay);
     chart.timeScale().fitContent();
-    requestAnimationFrame(redraw);
-    setTimeout(redraw, 150);
 }
 
 document.addEventListener("DOMContentLoaded", gfInitChart);
