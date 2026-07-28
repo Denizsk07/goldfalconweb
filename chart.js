@@ -52,8 +52,11 @@ function gfAddLineLevels(series, levels, defs) {
 
 // Session ranges get a shaded CSS box over the chart (drawn from
 // series.priceToCoordinate, since lightweight-charts v4 has no native
-// rectangle primitive) plus an axis-only price line (no line across the
-// chart — the box border already reads as the level).
+// rectangle primitive). No axis price line and no in-chart text label per
+// box on purpose — with 6 possible boxes that often overlap in a tight
+// range, per-box labels turn into a stacked, unreadable mess. Color +
+// solid/dashed border already encode session + today/yesterday; exact
+// numbers live in the zones list panel and a small legend under the chart.
 function gfBuildBoxes(series, levels, boxDefs, overlay) {
     const boxes = [];
     boxDefs.forEach((def) => {
@@ -61,28 +64,13 @@ function gfBuildBoxes(series, levels, boxDefs, overlay) {
         const low = levels[def.lowKey];
         if (!high || !low) return;
 
-        series.createPriceLine({ price: high, lineVisible: false, axisLabelVisible: true, title: def.label + " H", color: getComputedBoxColor(def.cls) });
-        series.createPriceLine({ price: low, lineVisible: false, axisLabelVisible: true, title: def.label + " L", color: getComputedBoxColor(def.cls) });
-
         const el = document.createElement("div");
         el.className = "gf-zone-box gf-zone-" + def.cls;
-        const label = document.createElement("span");
-        label.className = "gf-zone-box-label";
-        label.textContent = def.label;
-        el.appendChild(label);
         overlay.appendChild(el);
 
         boxes.push({ el, high, low });
     });
     return boxes;
-}
-
-function getComputedBoxColor(cls) {
-    const map = {
-        asia: "#7ec8e3", london: "#D9AE4E", ny: "#46D690",
-        "asia-y": "#7ec8e3", "london-y": "#D9AE4E", "ny-y": "#46D690",
-    };
-    return map[cls] || "#D9AE4E";
 }
 
 function gfPositionBoxes(chart, series, boxes, overlay) {
