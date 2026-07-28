@@ -48,4 +48,32 @@ document.addEventListener("DOMContentLoaded", () => {
             if (d.open) faqs.forEach(o => { if (o !== d) o.open = false; });
         });
     });
+
+    /* ---------- 4. Sticky CTA bar ---------- */
+    // Visible once the hero (with its own CTA) has scrolled out of view,
+    // hidden again once the real pricing/access section is on screen so
+    // there's never two "Zugang sichern" buttons competing at once.
+    const stickyCta = document.getElementById("gf-sticky-cta");
+    const heroEl = document.querySelector(".hero");
+    const zugangEl = document.getElementById("zugang");
+    if (stickyCta && heroEl) {
+        let heroVisible = true;
+        let zugangVisible = false;
+
+        const updateSticky = () => {
+            stickyCta.classList.toggle("gf-visible", !heroVisible && !zugangVisible);
+        };
+
+        new IntersectionObserver((entries) => {
+            entries.forEach((e) => { heroVisible = e.isIntersecting; });
+            updateSticky();
+        }, { threshold: 0 }).observe(heroEl);
+
+        if (zugangEl) {
+            new IntersectionObserver((entries) => {
+                entries.forEach((e) => { zugangVisible = e.isIntersecting; });
+                updateSticky();
+            }, { threshold: 0.3 }).observe(zugangEl);
+        }
+    }
 });

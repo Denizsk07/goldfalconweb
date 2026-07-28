@@ -326,6 +326,12 @@ h3{font-size:1.05rem;font-weight:700}
 .price .cur{font-size:1.8rem;color:var(--gold)}
 .price .once{font-family:var(--font-body);font-size:.85rem;font-weight:500;color:var(--muted)}
 .price-sub{color:var(--muted);font-size:.85rem;margin:1rem 0 1.6rem}
+.price-slots{
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  font-family:var(--font-mono); font-size:.78rem; font-weight:700; letter-spacing:.03em;
+  color:var(--gold-bright); margin-bottom:1.2rem;
+}
+.price-slots-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
 .price-note{display:block;margin-top:.9rem;font-size:.74rem;color:var(--muted)}
 
 /* FAQ */
@@ -366,6 +372,29 @@ h3{font-size:1.05rem;font-weight:700}
 .footer-links{display:flex;gap:1.6rem;margin-top:1.6rem;font-size:.78rem;color:var(--muted)}
 .footer-links a:hover{color:var(--gold-bright)}
 
+/* ============ STICKY CTA BAR ============ */
+.gf-sticky-cta{
+  position:fixed; left:50%; bottom:1.2rem; transform:translate(-50%,calc(100% + 1.5rem));
+  z-index:60;
+  display:flex; align-items:center; gap:1.2rem;
+  padding:.8rem 1rem .8rem 1.4rem;
+  background:rgba(15,13,8,.92); backdrop-filter:blur(14px);
+  border:1px solid var(--line); border-radius:99px;
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
+  max-width:calc(100vw - 2rem);
+}
+.gf-sticky-cta.gf-visible{ transform:translate(-50%,0); }
+.gf-sticky-cta-text{ font-size:.85rem; color:var(--text); white-space:nowrap; }
+.gf-sticky-cta .btn-small{ white-space:nowrap; flex-shrink:0; }
+
+@media(max-width:640px){
+  .gf-sticky-cta{ left:1rem; right:1rem; transform:translateY(calc(100% + 1.5rem)); width:auto; max-width:none; }
+  .gf-sticky-cta.gf-visible{ transform:translateY(0); }
+  .gf-sticky-cta-text{ display:none; }
+  .gf-sticky-cta{ justify-content:center; }
+}
+
 /* ============ NAV ACTIONS (admin link) ============ */
 .nav-actions{ display:flex; align-items:center; gap:.9rem; }
 .nav-admin-link{
@@ -377,6 +406,28 @@ h3{font-size:1.05rem;font-weight:700}
 .nav-admin-link:hover{ border-color:var(--gold); color:var(--gold-bright); }
 
 /* ============ LIVE CHART & ZONES ============ */
+/* Set this section apart from the surrounding marketing copy — it's a
+   live tool/proof, not another sales paragraph. */
+#live{
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(217,174,78,.07), transparent 65%),
+    var(--ink-2);
+  border-top:1px solid rgba(217,174,78,.22);
+  border-bottom:1px solid rgba(217,174,78,.22);
+  position:relative;
+}
+#live::before{
+  content:"LIVE TOOL";
+  position:absolute; top:1.4rem; right:clamp(1rem,4vw,3rem);
+  font-family:var(--font-mono); font-size:.62rem; font-weight:700; letter-spacing:.18em;
+  color:var(--gold-dim);
+  border:1px solid var(--line); border-radius:99px;
+  padding:.3rem .8rem;
+}
+@media(max-width:640px){
+  #live::before{ display:none; }
+}
+
 .gf-trend-bar{
   display:flex; gap:1.5rem; flex-wrap:wrap;
   margin-bottom:1rem;
