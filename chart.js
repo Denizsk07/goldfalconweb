@@ -9,11 +9,16 @@
 //
 // Session ranges (Asia/London/NY high-low) are drawn as shaded boxes
 // anchored to their actual session time window (not the full chart width) —
-// same look as a proper TradingView "sessions" indicator. Everything else
-// (PDH/PDL, daily high, weekly high/low) is a single price with no time
-// range, so it's a plain line across the whole chart.
+// same look as a proper TradingView "sessions" indicator.
+//
+// FVG/Order-Block zones are timeframe-specific (an H1 FVG drawn on M15
+// candles doesn't correspond to anything real on screen), so the chart has
+// an M15/H1 toggle — switching it refetches BOTH the candles and the POIs
+// for that timeframe together, never one without the other.
 
 const GF_REFRESH_INTERVAL_MS = 60000;
+const GF_TIMEFRAMES = ["M15", "H1"];
+const GF_DEFAULT_TIMEFRAME = "M15";
 
 const GF_SESSION_BOXES = [
     { key: "asia", highKey: "asia_high", lowKey: "asia_low", windowKey: "asia", cls: "asia" },
@@ -27,12 +32,9 @@ const GF_SESSION_BOXES_YESTERDAY = [
     { key: "y-ny", highKey: "NYH", lowKey: "NYL", windowKey: "ny", cls: "ny-y" },
 ];
 
-const GF_LINE_LEVELS_TODAY = {
-    daily_high_today: { label: "Tageshoch", color: "#F2CE7B", style: "Solid" },
-    weekly_high: { label: "Wochenhoch", color: "#8A6E31", style: "Solid" },
-    weekly_low: { label: "Wochentief", color: "#8A6E31", style: "Solid" },
-};
-
+// Only PDH/PDL are drawn as plain lines now — daily/weekly high-low were
+// dropped per feedback (too much clutter on top of the session boxes,
+// which already show today's/yesterday's range).
 const GF_LINE_LEVELS_YESTERDAY = {
     PDH: { label: "PDH", color: "#F2CE7B", style: "Dashed" },
     PDL: { label: "PDL", color: "#F2CE7B", style: "Dashed" },
@@ -171,8 +173,8 @@ function gfPositionBoxes(chart, series, boxes, overlay) {
 // "settled" subscribeVisibleLogicalRangeChange event left the boxes visibly
 // lagging behind the candles while the chart was still animating.
 // Reads state.boxes on every frame (rather than closing over a fixed array)
-// so a later auto-refresh can swap in a new box set without restarting the
-// loop.
+// so a later refresh/timeframe switch can swap in a new box set without
+// restarting the loop.
 function gfStartRedrawLoop(chart, series, state, overlay) {
     let running = true;
     function loop() {
@@ -186,12 +188,14 @@ function gfStartRedrawLoop(chart, series, state, overlay) {
     };
 }
 
-async function gfFetchChartData() {
+// tf only affects candles + POIs — session boxes/PDH-PDL are the same
+// regardless of which timeframe's candles are on screen.
+async function gfFetchChartData(tf) {
     const [candlesRes, todayRes, yesterdayRes, poisRes, trendRes] = await Promise.all([
-        fetch(window.GF_API_BASE + "/api/chart/candles"),
+        fetch(window.GF_API_BASE + "/api/chart/candles?tf=" + tf),
         fetch(window.GF_API_BASE + "/api/zones/today"),
         fetch(window.GF_API_BASE + "/api/zones/yesterday"),
-        fetch(window.GF_API_BASE + "/api/chart/pois"),
+        fetch(window.GF_API_BASE + "/api/chart/pois?tf=" + tf),
         fetch(window.GF_API_BASE + "/api/chart/trend"),
     ]);
     const todayJson = await todayRes.json();
@@ -210,7 +214,7 @@ async function gfFetchChartData() {
 // (Re-)draws candles, price lines, zone boxes and the trend badges from a
 // freshly fetched data snapshot. Safe to call repeatedly on the same
 // chart/series — clears out the previous batch of price lines and box
-// elements first so nothing piles up across auto-refreshes.
+// elements first so nothing piles up across auto-refreshes/tf switches.
 function gfRenderChartData(chart, series, overlay, state, data) {
     state.priceLines.forEach((line) => {
         try {
@@ -223,7 +227,6 @@ function gfRenderChartData(chart, series, overlay, state, data) {
 
     series.setData(data.candles);
 
-    state.priceLines.push(...gfAddLineLevels(series, data.todayLevels, GF_LINE_LEVELS_TODAY));
     state.priceLines.push(...gfAddLineLevels(series, data.yesterdayLevels, GF_LINE_LEVELS_YESTERDAY));
 
     const lastCandleTime = data.candles[data.candles.length - 1].time;
@@ -235,6 +238,20 @@ function gfRenderChartData(chart, series, overlay, state, data) {
 
     gfSetTrendBadge("gf-trend-h1", data.trend.h1);
     gfSetTrendBadge("gf-trend-m15", data.trend.m15);
+}
+
+function gfSetupTimeframeToggle(onChange) {
+    const toggle = document.getElementById("gf-tf-toggle");
+    if (!toggle) return;
+    toggle.querySelectorAll(".gf-tf-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tf = btn.dataset.tf;
+            if (!GF_TIMEFRAMES.includes(tf) || btn.classList.contains("active")) return;
+            toggle.querySelectorAll(".gf-tf-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            onChange(tf);
+        });
+    });
 }
 
 async function gfInitChart() {
@@ -249,7 +266,9 @@ async function gfInitChart() {
     if (emptyEl) emptyEl.hidden = true;
     overlay.innerHTML = "";
 
-    const data = await gfFetchChartData().catch(() => null);
+    const state = { boxes: [], priceLines: [], timeframe: GF_DEFAULT_TIMEFRAME };
+
+    const data = await gfFetchChartData(state.timeframe).catch(() => null);
     if (!data || !data.candles.length) {
         mount.hidden = true;
         if (emptyEl) emptyEl.hidden = false;
@@ -276,17 +295,27 @@ async function gfInitChart() {
         wickDownColor: "#E4574F",
     });
 
-    const state = { boxes: [], priceLines: [] };
     gfRenderChartData(chart, series, overlay, state, data);
-
     gfStartRedrawLoop(chart, series, state, overlay);
     chart.timeScale().fitContent();
+
+    // Switching M15/H1 is a full data-range change (different candle set
+    // entirely), so — unlike the auto-refresh below — this DOES reset the
+    // view via fitContent().
+    gfSetupTimeframeToggle(async (tf) => {
+        state.timeframe = tf;
+        const fresh = await gfFetchChartData(tf).catch(() => null);
+        if (fresh && fresh.candles.length) {
+            gfRenderChartData(chart, series, overlay, state, fresh);
+            chart.timeScale().fitContent();
+        }
+    });
 
     // Auto-refresh: refetch and redraw every 60s so the chart stays live
     // without a manual page reload. Deliberately skips fitContent() here —
     // a visitor who zoomed/panned shouldn't get yanked back on every tick.
     setInterval(async () => {
-        const fresh = await gfFetchChartData().catch(() => null);
+        const fresh = await gfFetchChartData(state.timeframe).catch(() => null);
         if (fresh && fresh.candles.length) {
             gfRenderChartData(chart, series, overlay, state, fresh);
         }
