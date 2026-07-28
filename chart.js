@@ -108,6 +108,11 @@ async function gfInitChart() {
     const overlay = document.getElementById("gf-chart-zones");
     if (!mount || !window.LightweightCharts) return;
 
+    // Reset to the "loading" default in case this page came from bfcache
+    // (browser back/forward) with a stale empty-state left over.
+    mount.hidden = false;
+    if (emptyEl) emptyEl.hidden = true;
+
     let candles = [];
     let todayLevels = {};
     let yesterdayLevels = {};
