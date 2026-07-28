@@ -484,21 +484,21 @@ h3{font-size:1.05rem;font-weight:700}
 .gf-zone-london-y{ background:rgba(217,174,78,.05); border-color:rgba(217,174,78,.3); border-style:dashed; }
 .gf-zone-ny-y{ background:rgba(70,214,144,.05); border-color:rgba(70,214,144,.3); border-style:dashed; }
 
-/* FVG / Order Block zones */
-.gf-poi-box{
+/* Live BUY/SELL zones — straight from the bot's own tradable POI store */
+.gf-trade-zone{
   position:absolute; overflow:hidden; box-sizing:border-box;
-  border-top:1px dashed; border-bottom:1px dashed;
+  border-top:2px solid; border-bottom:2px solid;
   display:none;
 }
-.gf-poi-box-label{
-  position:absolute; right:3px; top:1px;
-  font-family:var(--font-mono); font-size:.58rem; font-weight:700; letter-spacing:.03em;
+.gf-trade-zone-label{
+  position:absolute; right:4px; top:1px;
+  font-family:var(--font-mono); font-size:.62rem; font-weight:700; letter-spacing:.04em;
   white-space:nowrap;
 }
-.gf-poi-bull{ background:rgba(70,214,144,.08); border-color:rgba(70,214,144,.45); }
-.gf-poi-bull .gf-poi-box-label{ color:var(--green); }
-.gf-poi-bear{ background:rgba(228,87,79,.08); border-color:rgba(228,87,79,.45); }
-.gf-poi-bear .gf-poi-box-label{ color:var(--red); }
+.gf-trade-buy{ background:rgba(70,214,144,.14); border-color:var(--green); }
+.gf-trade-buy .gf-trade-zone-label{ color:var(--green); }
+.gf-trade-sell{ background:rgba(228,87,79,.14); border-color:var(--red); }
+.gf-trade-sell .gf-trade-zone-label{ color:var(--red); }
 
 /* Legend under the chart */
 .gf-chart-legend{
@@ -511,8 +511,8 @@ h3{font-size:1.05rem;font-weight:700}
 .gf-legend-swatch.asia{ background:#7ec8e3; }
 .gf-legend-swatch.london{ background:#D9AE4E; }
 .gf-legend-swatch.ny{ background:#46D690; }
-.gf-legend-swatch.poi-bull{ background:transparent; border:1px dashed var(--green); }
-.gf-legend-swatch.poi-bear{ background:transparent; border:1px dashed var(--red); }
+.gf-legend-swatch.trade-buy{ background:rgba(70,214,144,.14); border:2px solid var(--green); }
+.gf-legend-swatch.trade-sell{ background:rgba(228,87,79,.14); border:2px solid var(--red); }
 .gf-legend-sep{ width:1px; height:12px; background:var(--line-soft); }
 .gf-legend-style{ display:flex; align-items:center; gap:.4rem; }
 .gf-legend-line{ width:16px; height:0; border-top:2px solid var(--muted); }

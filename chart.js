@@ -11,10 +11,13 @@
 // anchored to their actual session time window (not the full chart width) —
 // same look as a proper TradingView "sessions" indicator.
 //
-// FVG/Order-Block zones are timeframe-specific (an H1 FVG drawn on M15
-// candles doesn't correspond to anything real on screen), so the chart has
-// an M15/H1 toggle — switching it refetches BOTH the candles and the POIs
-// for that timeframe together, never one without the other.
+// BUY/SELL zones come straight from the bot's own live POI store (the
+// exact same zones + eligibility rules — displacement check, touch/trade
+// limits, mitigation, expiry — it uses to decide whether a setup is still
+// tradable), not a generic always-on FVG/OB list, so what's drawn here is
+// literally "the bot would trade here right now". The bot only ever
+// zone-trades M15, so these are independent of the M15/H1 toggle below —
+// only candles change with the toggle, the zones stay put.
 
 const GF_REFRESH_INTERVAL_MS = 60000;
 const GF_TIMEFRAMES = ["M15", "H1"];
@@ -94,11 +97,10 @@ function gfBuildBoxes(levels, windows, boxDefs, overlay) {
     return boxes;
 }
 
-// FVG/Order-Block zones from the bot's own market-memory POI tracking.
-// These don't have a natural "end" time (they stay active until mitigated,
-// and we only ever fetch unmitigated ones) — drawn from creation time out
-// to the last candle, same convention as "still open" zones on ICT/SMC
-// TradingView indicators.
+// Tradable zones don't have a natural "end" time (they stay live until the
+// bot's own store marks them mitigated/depleted/expired) — drawn from
+// creation time out to the last candle, same convention as "still open"
+// zones on ICT/SMC TradingView indicators.
 function gfParseIsoToUnix(iso) {
     if (!iso) return null;
     const withZone = /[zZ]|[+-]\d\d:\d\d$/.test(iso) ? iso : iso + "Z";
@@ -106,32 +108,32 @@ function gfParseIsoToUnix(iso) {
     return isNaN(t) ? null : Math.floor(t / 1000);
 }
 
-// Unmitigated zones have no natural "end" time, but drawing them all the
-// way out to the last candle makes an old, still-open FVG stretch across
-// most of the visible chart (a gap from 2 days ago on a ~4-day M15 window
-// covers ~40% of the width) — real ICT/SMC indicators cap how far a zone
-// extends instead of dragging it out indefinitely. Capped to a fixed number
-// of bars from creation so it stays a "zone", not a wallpaper stripe.
-const GF_POI_MAX_EXTEND_BARS = 30;
+// Drawing a zone all the way out to the last candle makes an old, still-open
+// one stretch across most of the visible chart (a gap from 2 days ago on a
+// ~4-day M15 window covers ~40% of the width) — real ICT/SMC indicators cap
+// how far a zone extends instead of dragging it out indefinitely. Capped to
+// a fixed number of bars from creation so it stays a "zone", not a
+// wallpaper stripe.
+const GF_TRADE_ZONE_MAX_EXTEND_BARS = 30;
 
-function gfBuildPoiBoxes(pois, lastCandleTime, barIntervalSec, overlay) {
+function gfBuildTradeZoneBoxes(zones, lastCandleTime, barIntervalSec, overlay) {
     const boxes = [];
-    const maxExtend = GF_POI_MAX_EXTEND_BARS * (barIntervalSec || 900);
-    (pois || []).forEach((p) => {
-        const startTs = gfParseIsoToUnix(p.created_at);
-        if (!startTs || !p.high || !p.low) return;
-        const bullish = p.direction === "bullish";
+    const maxExtend = GF_TRADE_ZONE_MAX_EXTEND_BARS * (barIntervalSec || 900);
+    (zones || []).forEach((z) => {
+        const startTs = gfParseIsoToUnix(z.created_at);
+        if (!startTs || !z.high || !z.low) return;
+        const isBuy = z.zone === "BUY";
 
         const el = document.createElement("div");
-        el.className = "gf-poi-box " + (bullish ? "gf-poi-bull" : "gf-poi-bear");
+        el.className = "gf-trade-zone " + (isBuy ? "gf-trade-buy" : "gf-trade-sell");
         const label = document.createElement("span");
-        label.className = "gf-poi-box-label";
-        label.textContent = (p.type || "").toUpperCase();
+        label.className = "gf-trade-zone-label";
+        label.textContent = isBuy ? "BUY" : "SELL";
         el.appendChild(label);
         overlay.appendChild(el);
 
         const endTs = Math.min(lastCandleTime, startTs + maxExtend);
-        boxes.push({ el, label, high: p.high, low: p.low, startTs, endTs });
+        boxes.push({ el, label, high: z.high, low: z.low, startTs, endTs });
     });
     return boxes;
 }
@@ -198,14 +200,14 @@ function gfStartRedrawLoop(chart, series, state, overlay) {
     };
 }
 
-// tf only affects candles + POIs — session boxes/PDH-PDL are the same
+// tf only affects candles — session boxes/PDH-PDL/trade zones are the same
 // regardless of which timeframe's candles are on screen.
 async function gfFetchChartData(tf) {
-    const [candlesRes, todayRes, yesterdayRes, poisRes, trendRes] = await Promise.all([
+    const [candlesRes, todayRes, yesterdayRes, zonesRes, trendRes] = await Promise.all([
         fetch(window.GF_API_BASE + "/api/chart/candles?tf=" + tf),
         fetch(window.GF_API_BASE + "/api/zones/today"),
         fetch(window.GF_API_BASE + "/api/zones/yesterday"),
-        fetch(window.GF_API_BASE + "/api/chart/pois?tf=" + tf),
+        fetch(window.GF_API_BASE + "/api/chart/trade-zones"),
         fetch(window.GF_API_BASE + "/api/chart/trend"),
     ]);
     const todayJson = await todayRes.json();
@@ -216,7 +218,7 @@ async function gfFetchChartData(tf) {
         yesterdayLevels: yesterdayJson.levels || {},
         todayWindows: todayJson.session_windows || {},
         yesterdayWindows: yesterdayJson.session_windows || {},
-        pois: (await poisRes.json()).pois || [],
+        tradeZones: (await zonesRes.json()).zones || [],
         trend: await trendRes.json(),
     };
 }
@@ -245,7 +247,7 @@ function gfRenderChartData(chart, series, overlay, state, data) {
     state.boxes = [
         ...gfBuildBoxes(data.todayLevels, data.todayWindows, GF_SESSION_BOXES, overlay),
         ...gfBuildBoxes(data.yesterdayLevels, data.yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
-        ...gfBuildPoiBoxes(data.pois, lastCandleTime, barIntervalSec, overlay),
+        ...gfBuildTradeZoneBoxes(data.tradeZones, lastCandleTime, barIntervalSec, overlay),
     ];
 
     gfSetTrendBadge("gf-trend-h1", data.trend.h1);
