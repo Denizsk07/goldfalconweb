@@ -13,6 +13,8 @@
 // (PDH/PDL, daily high, weekly high/low) is a single price with no time
 // range, so it's a plain line across the whole chart.
 
+const GF_REFRESH_INTERVAL_MS = 60000;
+
 const GF_SESSION_BOXES = [
     { key: "asia", highKey: "asia_high", lowKey: "asia_low", windowKey: "asia", cls: "asia" },
     { key: "london", highKey: "london_high", lowKey: "london_low", windowKey: "london", cls: "london" },
@@ -36,19 +38,26 @@ const GF_LINE_LEVELS_YESTERDAY = {
     PDL: { label: "PDL", color: "#F2CE7B", style: "Dashed" },
 };
 
+// Returns the created price-line handles so a later refresh can remove them
+// again before drawing the next batch (series.setData() alone doesn't
+// touch price lines — they'd otherwise pile up on every refresh).
 function gfAddLineLevels(series, levels, defs) {
+    const lines = [];
     Object.entries(defs).forEach(([key, def]) => {
         const price = levels[key];
         if (!price) return;
-        series.createPriceLine({
-            price,
-            color: def.color,
-            lineWidth: 1,
-            lineStyle: LightweightCharts.LineStyle[def.style],
-            axisLabelVisible: true,
-            title: def.label,
-        });
+        lines.push(
+            series.createPriceLine({
+                price,
+                color: def.color,
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle[def.style],
+                axisLabelVisible: true,
+                title: def.label,
+            })
+        );
     });
+    return lines;
 }
 
 const GF_BOX_LABELS = {
@@ -161,17 +170,71 @@ function gfPositionBoxes(chart, series, boxes, overlay) {
 // lightweight-charts eases those internally, and relying only on the
 // "settled" subscribeVisibleLogicalRangeChange event left the boxes visibly
 // lagging behind the candles while the chart was still animating.
-function gfStartRedrawLoop(chart, series, boxes, overlay) {
+// Reads state.boxes on every frame (rather than closing over a fixed array)
+// so a later auto-refresh can swap in a new box set without restarting the
+// loop.
+function gfStartRedrawLoop(chart, series, state, overlay) {
     let running = true;
     function loop() {
         if (!running) return;
-        gfPositionBoxes(chart, series, boxes, overlay);
+        gfPositionBoxes(chart, series, state.boxes, overlay);
         requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
     return () => {
         running = false;
     };
+}
+
+async function gfFetchChartData() {
+    const [candlesRes, todayRes, yesterdayRes, poisRes, trendRes] = await Promise.all([
+        fetch(window.GF_API_BASE + "/api/chart/candles"),
+        fetch(window.GF_API_BASE + "/api/zones/today"),
+        fetch(window.GF_API_BASE + "/api/zones/yesterday"),
+        fetch(window.GF_API_BASE + "/api/chart/pois"),
+        fetch(window.GF_API_BASE + "/api/chart/trend"),
+    ]);
+    const todayJson = await todayRes.json();
+    const yesterdayJson = await yesterdayRes.json();
+    return {
+        candles: (await candlesRes.json()).candles || [],
+        todayLevels: todayJson.levels || {},
+        yesterdayLevels: yesterdayJson.levels || {},
+        todayWindows: todayJson.session_windows || {},
+        yesterdayWindows: yesterdayJson.session_windows || {},
+        pois: (await poisRes.json()).pois || [],
+        trend: await trendRes.json(),
+    };
+}
+
+// (Re-)draws candles, price lines, zone boxes and the trend badges from a
+// freshly fetched data snapshot. Safe to call repeatedly on the same
+// chart/series — clears out the previous batch of price lines and box
+// elements first so nothing piles up across auto-refreshes.
+function gfRenderChartData(chart, series, overlay, state, data) {
+    state.priceLines.forEach((line) => {
+        try {
+            series.removePriceLine(line);
+        } catch (e) {}
+    });
+    overlay.innerHTML = "";
+    state.priceLines = [];
+    state.boxes = [];
+
+    series.setData(data.candles);
+
+    state.priceLines.push(...gfAddLineLevels(series, data.todayLevels, GF_LINE_LEVELS_TODAY));
+    state.priceLines.push(...gfAddLineLevels(series, data.yesterdayLevels, GF_LINE_LEVELS_YESTERDAY));
+
+    const lastCandleTime = data.candles[data.candles.length - 1].time;
+    state.boxes = [
+        ...gfBuildBoxes(data.todayLevels, data.todayWindows, GF_SESSION_BOXES, overlay),
+        ...gfBuildBoxes(data.yesterdayLevels, data.yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
+        ...gfBuildPoiBoxes(data.pois, lastCandleTime, overlay),
+    ];
+
+    gfSetTrendBadge("gf-trend-h1", data.trend.h1);
+    gfSetTrendBadge("gf-trend-m15", data.trend.m15);
 }
 
 async function gfInitChart() {
@@ -186,39 +249,8 @@ async function gfInitChart() {
     if (emptyEl) emptyEl.hidden = true;
     overlay.innerHTML = "";
 
-    let candles = [];
-    let todayLevels = {};
-    let yesterdayLevels = {};
-    let todayWindows = {};
-    let yesterdayWindows = {};
-    let pois = [];
-    let trend = {};
-
-    try {
-        const [candlesRes, todayRes, yesterdayRes, poisRes, trendRes] = await Promise.all([
-            fetch(window.GF_API_BASE + "/api/chart/candles"),
-            fetch(window.GF_API_BASE + "/api/zones/today"),
-            fetch(window.GF_API_BASE + "/api/zones/yesterday"),
-            fetch(window.GF_API_BASE + "/api/chart/pois"),
-            fetch(window.GF_API_BASE + "/api/chart/trend"),
-        ]);
-        const candlesJson = await candlesRes.json();
-        const todayJson = await todayRes.json();
-        const yesterdayJson = await yesterdayRes.json();
-        candles = candlesJson.candles || [];
-        todayLevels = todayJson.levels || {};
-        yesterdayLevels = yesterdayJson.levels || {};
-        todayWindows = todayJson.session_windows || {};
-        yesterdayWindows = yesterdayJson.session_windows || {};
-        pois = (await poisRes.json()).pois || [];
-        trend = await trendRes.json();
-    } catch (e) {
-        mount.hidden = true;
-        if (emptyEl) emptyEl.hidden = false;
-        return;
-    }
-
-    if (!candles.length) {
+    const data = await gfFetchChartData().catch(() => null);
+    if (!data || !data.candles.length) {
         mount.hidden = true;
         if (emptyEl) emptyEl.hidden = false;
         return;
@@ -244,23 +276,21 @@ async function gfInitChart() {
         wickDownColor: "#E4574F",
     });
 
-    series.setData(candles);
+    const state = { boxes: [], priceLines: [] };
+    gfRenderChartData(chart, series, overlay, state, data);
 
-    gfAddLineLevels(series, todayLevels, GF_LINE_LEVELS_TODAY);
-    gfAddLineLevels(series, yesterdayLevels, GF_LINE_LEVELS_YESTERDAY);
-
-    const lastCandleTime = candles[candles.length - 1].time;
-    const boxes = [
-        ...gfBuildBoxes(todayLevels, todayWindows, GF_SESSION_BOXES, overlay),
-        ...gfBuildBoxes(yesterdayLevels, yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
-        ...gfBuildPoiBoxes(pois, lastCandleTime, overlay),
-    ];
-
-    gfSetTrendBadge("gf-trend-h1", trend.h1);
-    gfSetTrendBadge("gf-trend-m15", trend.m15);
-
-    gfStartRedrawLoop(chart, series, boxes, overlay);
+    gfStartRedrawLoop(chart, series, state, overlay);
     chart.timeScale().fitContent();
+
+    // Auto-refresh: refetch and redraw every 60s so the chart stays live
+    // without a manual page reload. Deliberately skips fitContent() here —
+    // a visitor who zoomed/panned shouldn't get yanked back on every tick.
+    setInterval(async () => {
+        const fresh = await gfFetchChartData().catch(() => null);
+        if (fresh && fresh.candles.length) {
+            gfRenderChartData(chart, series, overlay, state, fresh);
+        }
+    }, GF_REFRESH_INTERVAL_MS);
 }
 
 document.addEventListener("DOMContentLoaded", gfInitChart);
