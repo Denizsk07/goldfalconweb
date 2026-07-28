@@ -106,8 +106,17 @@ function gfParseIsoToUnix(iso) {
     return isNaN(t) ? null : Math.floor(t / 1000);
 }
 
-function gfBuildPoiBoxes(pois, lastCandleTime, overlay) {
+// Unmitigated zones have no natural "end" time, but drawing them all the
+// way out to the last candle makes an old, still-open FVG stretch across
+// most of the visible chart (a gap from 2 days ago on a ~4-day M15 window
+// covers ~40% of the width) — real ICT/SMC indicators cap how far a zone
+// extends instead of dragging it out indefinitely. Capped to a fixed number
+// of bars from creation so it stays a "zone", not a wallpaper stripe.
+const GF_POI_MAX_EXTEND_BARS = 30;
+
+function gfBuildPoiBoxes(pois, lastCandleTime, barIntervalSec, overlay) {
     const boxes = [];
+    const maxExtend = GF_POI_MAX_EXTEND_BARS * (barIntervalSec || 900);
     (pois || []).forEach((p) => {
         const startTs = gfParseIsoToUnix(p.created_at);
         if (!startTs || !p.high || !p.low) return;
@@ -121,7 +130,8 @@ function gfBuildPoiBoxes(pois, lastCandleTime, overlay) {
         el.appendChild(label);
         overlay.appendChild(el);
 
-        boxes.push({ el, label, high: p.high, low: p.low, startTs, endTs: lastCandleTime });
+        const endTs = Math.min(lastCandleTime, startTs + maxExtend);
+        boxes.push({ el, label, high: p.high, low: p.low, startTs, endTs });
     });
     return boxes;
 }
@@ -230,10 +240,12 @@ function gfRenderChartData(chart, series, overlay, state, data) {
     state.priceLines.push(...gfAddLineLevels(series, data.yesterdayLevels, GF_LINE_LEVELS_YESTERDAY));
 
     const lastCandleTime = data.candles[data.candles.length - 1].time;
+    const barIntervalSec =
+        data.candles.length > 1 ? data.candles[1].time - data.candles[0].time : 900;
     state.boxes = [
         ...gfBuildBoxes(data.todayLevels, data.todayWindows, GF_SESSION_BOXES, overlay),
         ...gfBuildBoxes(data.yesterdayLevels, data.yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
-        ...gfBuildPoiBoxes(data.pois, lastCandleTime, overlay),
+        ...gfBuildPoiBoxes(data.pois, lastCandleTime, barIntervalSec, overlay),
     ];
 
     gfSetTrendBadge("gf-trend-h1", data.trend.h1);
