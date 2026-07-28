@@ -83,6 +83,47 @@ function gfBuildBoxes(levels, windows, boxDefs, overlay) {
     return boxes;
 }
 
+// FVG/Order-Block zones from the bot's own market-memory POI tracking.
+// These don't have a natural "end" time (they stay active until mitigated,
+// and we only ever fetch unmitigated ones) — drawn from creation time out
+// to the last candle, same convention as "still open" zones on ICT/SMC
+// TradingView indicators.
+function gfParseIsoToUnix(iso) {
+    if (!iso) return null;
+    const withZone = /[zZ]|[+-]\d\d:\d\d$/.test(iso) ? iso : iso + "Z";
+    const t = Date.parse(withZone);
+    return isNaN(t) ? null : Math.floor(t / 1000);
+}
+
+function gfBuildPoiBoxes(pois, lastCandleTime, overlay) {
+    const boxes = [];
+    (pois || []).forEach((p) => {
+        const startTs = gfParseIsoToUnix(p.created_at);
+        if (!startTs || !p.high || !p.low) return;
+        const bullish = p.direction === "bullish";
+
+        const el = document.createElement("div");
+        el.className = "gf-poi-box " + (bullish ? "gf-poi-bull" : "gf-poi-bear");
+        const label = document.createElement("span");
+        label.className = "gf-poi-box-label";
+        label.textContent = (p.type || "").toUpperCase();
+        el.appendChild(label);
+        overlay.appendChild(el);
+
+        boxes.push({ el, label, high: p.high, low: p.low, startTs, endTs: lastCandleTime });
+    });
+    return boxes;
+}
+
+function gfSetTrendBadge(elId, value) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const v = (value || "CHOP").toUpperCase();
+    el.textContent = v;
+    el.classList.remove("bull", "bear", "chop");
+    el.classList.add(v === "BULL" ? "bull" : v === "BEAR" ? "bear" : "chop");
+}
+
 function gfClampToVisibleRange(chart, ts) {
     const range = chart.timeScale().getVisibleRange();
     if (!range) return ts;
@@ -150,12 +191,16 @@ async function gfInitChart() {
     let yesterdayLevels = {};
     let todayWindows = {};
     let yesterdayWindows = {};
+    let pois = [];
+    let trend = {};
 
     try {
-        const [candlesRes, todayRes, yesterdayRes] = await Promise.all([
+        const [candlesRes, todayRes, yesterdayRes, poisRes, trendRes] = await Promise.all([
             fetch(window.GF_API_BASE + "/api/chart/candles"),
             fetch(window.GF_API_BASE + "/api/zones/today"),
             fetch(window.GF_API_BASE + "/api/zones/yesterday"),
+            fetch(window.GF_API_BASE + "/api/chart/pois"),
+            fetch(window.GF_API_BASE + "/api/chart/trend"),
         ]);
         const candlesJson = await candlesRes.json();
         const todayJson = await todayRes.json();
@@ -165,6 +210,8 @@ async function gfInitChart() {
         yesterdayLevels = yesterdayJson.levels || {};
         todayWindows = todayJson.session_windows || {};
         yesterdayWindows = yesterdayJson.session_windows || {};
+        pois = (await poisRes.json()).pois || [];
+        trend = await trendRes.json();
     } catch (e) {
         mount.hidden = true;
         if (emptyEl) emptyEl.hidden = false;
@@ -202,10 +249,15 @@ async function gfInitChart() {
     gfAddLineLevels(series, todayLevels, GF_LINE_LEVELS_TODAY);
     gfAddLineLevels(series, yesterdayLevels, GF_LINE_LEVELS_YESTERDAY);
 
+    const lastCandleTime = candles[candles.length - 1].time;
     const boxes = [
         ...gfBuildBoxes(todayLevels, todayWindows, GF_SESSION_BOXES, overlay),
         ...gfBuildBoxes(yesterdayLevels, yesterdayWindows, GF_SESSION_BOXES_YESTERDAY, overlay),
+        ...gfBuildPoiBoxes(pois, lastCandleTime, overlay),
     ];
+
+    gfSetTrendBadge("gf-trend-h1", trend.h1);
+    gfSetTrendBadge("gf-trend-m15", trend.m15);
 
     gfStartRedrawLoop(chart, series, boxes, overlay);
     chart.timeScale().fitContent();

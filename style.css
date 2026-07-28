@@ -377,7 +377,22 @@ h3{font-size:1.05rem;font-weight:700}
 .nav-admin-link:hover{ border-color:var(--gold); color:var(--gold-bright); }
 
 /* ============ LIVE CHART & ZONES ============ */
-.live-grid{ display:grid; grid-template-columns:1.6fr 1fr; gap:1.5rem; }
+.gf-trend-bar{
+  display:flex; gap:1.5rem; flex-wrap:wrap;
+  margin-bottom:1rem;
+  font-family:var(--font-mono); font-size:.78rem; color:var(--muted);
+}
+.gf-trend-item{ display:flex; align-items:center; gap:.5rem; }
+.gf-trend-badge{
+  display:inline-block; padding:.15rem .55rem; border-radius:4px;
+  font-weight:700; letter-spacing:.04em; color:var(--text);
+  background:rgba(255,255,255,.06); border:1px solid var(--line-soft);
+}
+.gf-trend-badge.bull{ color:var(--green); background:rgba(70,214,144,.1); border-color:rgba(70,214,144,.4); }
+.gf-trend-badge.bear{ color:var(--red); background:rgba(228,87,79,.1); border-color:rgba(228,87,79,.4); }
+.gf-trend-badge.chop{ color:var(--gold-bright); background:rgba(217,174,78,.08); border-color:rgba(217,174,78,.35); }
+
+.live-grid{ display:grid; grid-template-columns:1.6fr 1fr; gap:1.5rem; align-items:start; }
 .live-chart-card{
   background:#131722; border:1px solid var(--line-soft); border-radius:var(--radius);
   overflow:hidden; min-height:420px; position:relative;
@@ -408,6 +423,22 @@ h3{font-size:1.05rem;font-weight:700}
 .gf-zone-london-y{ background:rgba(217,174,78,.05); border-color:rgba(217,174,78,.3); border-style:dashed; }
 .gf-zone-ny-y{ background:rgba(70,214,144,.05); border-color:rgba(70,214,144,.3); border-style:dashed; }
 
+/* FVG / Order Block zones */
+.gf-poi-box{
+  position:absolute; overflow:hidden; box-sizing:border-box;
+  border-top:1px dashed; border-bottom:1px dashed;
+  display:none;
+}
+.gf-poi-box-label{
+  position:absolute; right:3px; top:1px;
+  font-family:var(--font-mono); font-size:.58rem; font-weight:700; letter-spacing:.03em;
+  white-space:nowrap;
+}
+.gf-poi-bull{ background:rgba(70,214,144,.08); border-color:rgba(70,214,144,.45); }
+.gf-poi-bull .gf-poi-box-label{ color:var(--green); }
+.gf-poi-bear{ background:rgba(228,87,79,.08); border-color:rgba(228,87,79,.45); }
+.gf-poi-bear .gf-poi-box-label{ color:var(--red); }
+
 /* Legend under the chart */
 .gf-chart-legend{
   display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap;
@@ -419,6 +450,8 @@ h3{font-size:1.05rem;font-weight:700}
 .gf-legend-swatch.asia{ background:#7ec8e3; }
 .gf-legend-swatch.london{ background:#D9AE4E; }
 .gf-legend-swatch.ny{ background:#46D690; }
+.gf-legend-swatch.poi-bull{ background:transparent; border:1px dashed var(--green); }
+.gf-legend-swatch.poi-bear{ background:transparent; border:1px dashed var(--red); }
 .gf-legend-sep{ width:1px; height:12px; background:var(--line-soft); }
 .gf-legend-style{ display:flex; align-items:center; gap:.4rem; }
 .gf-legend-line{ width:16px; height:0; border-top:2px solid var(--muted); }
