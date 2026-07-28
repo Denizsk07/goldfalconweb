@@ -386,6 +386,31 @@ h3{font-size:1.05rem;font-weight:700}
 .gf-chart-mount{ height:420px; width:100%; }
 .gf-chart-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; }
 
+.gf-chart-zones-overlay{ position:absolute; top:0; bottom:0; left:0; right:56px; pointer-events:none; z-index:2; }
+.gf-zone-box{
+  position:absolute; left:0; right:0;
+  border-top:1px solid; border-bottom:1px solid;
+  display:none;
+}
+.gf-zone-box-label{
+  position:absolute; left:6px; top:2px;
+  font-family:var(--font-mono); font-size:.62rem; font-weight:600; letter-spacing:.05em;
+  padding:1px 5px; border-radius:3px; color:var(--ink);
+}
+.gf-zone-asia{ background:rgba(126,200,227,.12); border-color:rgba(126,200,227,.55); }
+.gf-zone-asia .gf-zone-box-label{ background:#7ec8e3; }
+.gf-zone-london{ background:rgba(217,174,78,.12); border-color:rgba(217,174,78,.55); }
+.gf-zone-london .gf-zone-box-label{ background:#D9AE4E; }
+.gf-zone-ny{ background:rgba(70,214,144,.12); border-color:rgba(70,214,144,.55); }
+.gf-zone-ny .gf-zone-box-label{ background:#46D690; }
+
+.gf-zone-asia-y{ background:rgba(126,200,227,.05); border-color:rgba(126,200,227,.3); border-style:dashed; }
+.gf-zone-asia-y .gf-zone-box-label{ background:rgba(126,200,227,.6); }
+.gf-zone-london-y{ background:rgba(217,174,78,.05); border-color:rgba(217,174,78,.3); border-style:dashed; }
+.gf-zone-london-y .gf-zone-box-label{ background:rgba(217,174,78,.6); }
+.gf-zone-ny-y{ background:rgba(70,214,144,.05); border-color:rgba(70,214,144,.3); border-style:dashed; }
+.gf-zone-ny-y .gf-zone-box-label{ background:rgba(70,214,144,.6); }
+
 .zones-card{ display:flex; flex-direction:column; gap:1.2rem; }
 .zones-block{
   background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius);
