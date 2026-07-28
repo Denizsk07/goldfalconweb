@@ -389,8 +389,9 @@ h3{font-size:1.05rem;font-weight:700}
 
 .gf-chart-zones-overlay{ position:absolute; top:0; bottom:0; left:0; right:56px; pointer-events:none; z-index:2; }
 .gf-zone-box{
-  position:absolute; left:0; right:0;
-  border-top:1px solid; border-bottom:1px solid;
+  position:absolute;
+  border-top:1px solid; border-bottom:1px solid; border-left:1px solid; border-right:1px solid;
+  box-sizing:border-box;
   display:none;
 }
 .gf-zone-asia{ background:rgba(126,200,227,.12); border-color:rgba(126,200,227,.55); }
